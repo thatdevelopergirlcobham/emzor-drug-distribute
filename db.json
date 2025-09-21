@@ -1,0 +1,136 @@
+{
+  "products": [
+    {
+      "id": "em-001",
+      "name": "Emzor Paracetamol",
+      "category": "Pain & Fever",
+      "price": 150,
+      "description": "Effective relief from pain and fever for the whole family. Fast-acting formula that provides quick relief from headaches, body aches, and fever symptoms.",
+      "imageUrl": "https://medecify.com/storages/2022/11/emzor-paracetamol-500mg-tabs-blister-x12-1_tgzjb9_ddf1609e-1a1a-4c56-8cc1-f9cfa3b08b66_600x.webp"
+    },
+    {
+      "id": "em-002",
+      "name": "Zorocef (Cefuroxime Axetil)",
+      "category": "Antibiotics",
+      "price": 1200,
+      "description": "A powerful antibiotic for treating bacterial infections. Effective against a wide range of bacterial infections including respiratory tract infections, urinary tract infections, and skin infections.",
+      "imageUrl": "https://medecify.com/storages/2022/11/emzor-paracetamol-500mg-tabs-blister-x12-1_tgzjb9_ddf1609e-1a1a-4c56-8cc1-f9cfa3b08b66_600x.webp"
+    },
+    {
+      "id": "em-003",
+      "name": "Em-Vit C (Vitamin C)",
+      "category": "Vitamins",
+      "price": 500,
+      "description": "Boosts the immune system and promotes healthy skin. High-strength vitamin C supplement that helps support immune function and collagen production for healthy skin and joints.",
+      "imageUrl": "https://medecify.com/storages/2022/11/emzor-paracetamol-500mg-tabs-blister-x12-1_tgzjb9_ddf1609e-1a1a-4c56-8cc1-f9cfa3b08b66_600x.webp"
+    },
+    {
+      "id": "em-004",
+      "name": "Emzor Cough Syrup",
+      "category": "Cough & Cold",
+      "price": 250,
+      "description": "Fast relief from cough and cold symptoms. Contains natural ingredients that soothe the throat and suppress cough while providing relief from congestion.",
+      "imageUrl": "https://medecify.com/storages/2022/11/emzor-paracetamol-500mg-tabs-blister-x12-1_tgzjb9_ddf1609e-1a1a-4c56-8cc1-f9cfa3b08b66_600x.webp"
+    },
+    {
+      "id": "em-005",
+      "name": "Emzor Multivitamin",
+      "category": "Vitamins",
+      "price": 750,
+      "description": "Complete daily multivitamin for overall health. Contains essential vitamins and minerals to support daily nutritional needs and maintain optimal health.",
+      "imageUrl": "https://medecify.com/storages/2022/11/emzor-paracetamol-500mg-tabs-blister-x12-1_tgzjb9_ddf1609e-1a1a-4c56-8cc1-f9cfa3b08b66_600x.webp"
+    },
+    {
+      "id": "em-006",
+      "name": "Emzor Pain Relief Gel",
+      "category": "Pain & Fever",
+      "price": 300,
+      "description": "Topical pain relief gel for muscle and joint pain. Fast-absorbing formula that provides targeted relief for muscle aches, joint pain, and inflammation.",
+      "imageUrl": "https://medecify.com/storages/2022/11/emzor-paracetamol-500mg-tabs-blister-x12-1_tgzjb9_ddf1609e-1a1a-4c56-8cc1-f9cfa3b08b66_600x.webp"
+    }
+  ],
+  "users": [
+    {
+      "id": "admin-1",
+      "name": "Emzor Admin",
+      "email": "admin@emzor.com",
+      "password": "password",
+      "role": "ADMIN"
+    },
+    {
+      "id": "user-1",
+      "name": "John Doe",
+      "email": "user@example.com",
+      "password": "password",
+      "role": "CUSTOMER"
+    }
+  ],
+  "orders": [
+    {
+      "id": "d7d8",
+      "userId": "user-1",
+      "items": [
+        {
+          "product": {
+            "id": "em-003",
+            "name": "Em-Vit C (Vitamin C)",
+            "category": "Vitamins",
+            "price": 500,
+            "description": "Boosts the immune system and promotes healthy skin. High-strength vitamin C supplement that helps support immune function and collagen production for healthy skin and joints.",
+            "imageUrl": "https://medecify.com/storages/2022/11/emzor-paracetamol-500mg-tabs-blister-x12-1_tgzjb9_ddf1609e-1a1a-4c56-8cc1-f9cfa3b08b66_600x.webp"
+          },
+          "quantity": 5,
+          "price": 500
+        },
+        {
+          "product": {
+            "id": "em-002",
+            "name": "Zorocef (Cefuroxime Axetil)",
+            "category": "Antibiotics",
+            "price": 1200,
+            "description": "A powerful antibiotic for treating bacterial infections. Effective against a wide range of bacterial infections including respiratory tract infections, urinary tract infections, and skin infections.",
+            "imageUrl": "https://medecify.com/storages/2022/11/emzor-paracetamol-500mg-tabs-blister-x12-1_tgzjb9_ddf1609e-1a1a-4c56-8cc1-f9cfa3b08b66_600x.webp"
+          },
+          "quantity": 1,
+          "price": 1200
+        },
+        {
+          "product": {
+            "id": "em-006",
+            "name": "Emzor Pain Relief Gel",
+            "category": "Pain & Fever",
+            "price": 300,
+            "description": "Topical pain relief gel for muscle and joint pain. Fast-absorbing formula that provides targeted relief for muscle aches, joint pain, and inflammation.",
+            "imageUrl": "https://medecify.com/storages/2022/11/emzor-paracetamol-500mg-tabs-blister-x12-1_tgzjb9_ddf1609e-1a1a-4c56-8cc1-f9cfa3b08b66_600x.webp"
+          },
+          "quantity": 4,
+          "price": 300
+        },
+        {
+          "product": {
+            "id": "em-005",
+            "name": "Emzor Multivitamin",
+            "category": "Vitamins",
+            "price": 750,
+            "description": "Complete daily multivitamin for overall health. Contains essential vitamins and minerals to support daily nutritional needs and maintain optimal health.",
+            "imageUrl": "https://medecify.com/storages/2022/11/emzor-paracetamol-500mg-tabs-blister-x12-1_tgzjb9_ddf1609e-1a1a-4c56-8cc1-f9cfa3b08b66_600x.webp"
+          },
+          "quantity": 2,
+          "price": 750
+        }
+      ],
+      "total": 6400,
+      "status": "PENDING",
+      "shippingAddress": {
+        "fullName": "Dawn Cobham",
+        "phone": "09165586474",
+        "address": "4 Ansa Oti Layout Parliamentary Extension Calabar",
+        "city": "Calabar",
+        "state": "Cross river State",
+        "postalCode": "23243443"
+      },
+      "createdAt": "2025-09-21T04:33:52.951Z",
+      "updatedAt": "2025-09-21T04:33:52.955Z"
+    }
+  ]
+}

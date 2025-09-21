@@ -1,36 +1,179 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Emzor Pharmaceutical E-Commerce Website
+
+A complete and professional e-commerce website for Emzor Pharmaceutical built with Next.js, TypeScript, and Tailwind CSS.
+
+## Features
+
+### 🛍️ E-Commerce Functionality
+- **Product Catalog**: Browse, search, and filter products
+- **Shopping Cart**: Add, remove, and update quantities
+- **Checkout Process**: Complete order placement with shipping and payment forms
+- **Product Details**: Detailed product pages with images and descriptions
+- **Category Navigation**: Organized product categories
+
+### 👨‍💼 Admin Dashboard
+- **Product Management**: Add, edit, and delete products
+- **Inventory Tracking**: Monitor product inventory and statistics
+- **User Authentication**: Secure admin login system
+- **Order Management**: View and manage customer orders
+
+### 🎨 Design & UX
+- **Responsive Design**: Works on desktop, tablet, and mobile
+- **Modern UI**: Clean, professional design with Emzor branding
+- **Interactive Elements**: Smooth animations and transitions
+- **Accessibility**: Built with accessibility best practices
+
+## Technology Stack
+
+- **Frontend**: Next.js 14, React 18, TypeScript
+- **Styling**: Tailwind CSS with custom Emzor brand colors
+- **Icons**: Lucide React
+- **State Management**: React Context API
+- **Backend**: JSON Server (mock API)
+- **Development**: Concurrently for running multiple servers
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Node.js 18+
+- npm or yarn
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd emzor-distribution
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Start the development servers**
+   ```bash
+   npm run dev
+   ```
+
+This will start both the JSON server (on port 3001) and the Next.js development server (on port 3000).
+
+### Admin Access
+
+To access the admin dashboard:
+
+1. Go to `/login`
+2. Click on "Admin Login" tab
+3. Use the following credentials:
+   - **Email**: `admin@emzor.com`
+   - **Password**: `password`
+
+### User Authentication
+
+To test user authentication:
+
+1. **Customer Login**: Go to `/login` and use "Customer Login" tab
+   - **Email**: `user@example.com`
+   - **Password**: `password`
+
+2. **User Registration**: Go to `/register` to create new accounts
+
+### Cart & Checkout Access
+
+- **Cart**: `/cart` - Requires user authentication
+- **Checkout**: `/checkout` - Requires user authentication
+- Unauthenticated users will be redirected to login page
+
+## Project Structure
+
+```
+emzor-distribution/
+├── app/                    # Next.js app directory
+│   ├── (admin)/           # Admin routes (protected)
+│   ├── admin/login/       # Admin login page
+│   ├── cart/              # Shopping cart page (protected)
+│   ├── checkout/          # Checkout page (protected)
+│   ├── login/             # User/Admin login page
+│   ├── register/          # User registration page
+│   ├── account/           # User account page
+│   ├── products/          # Products listing and detail pages
+│   └── ...                # Other pages
+├── components/            # React components
+│   ├── admin/            # Admin-specific components
+│   ├── layout/           # Layout components (Header, etc.)
+│   ├── products/         # Product-related components
+│   └── shared/           # Shared/reusable components
+├── context/              # React Context providers
+│   ├── UserContext.tsx   # User authentication and cart
+│   ├── AdminContext.tsx  # Admin authentication
+│   └── DataContext.tsx   # Product data management
+├── types/               # TypeScript type definitions
+├── db.json             # Mock database
+└── public/             # Static assets
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## API Endpoints
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The application uses JSON Server as a mock backend running on `http://localhost:3001`:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **GET** `/products` - Get all products
+- **GET** `/products/:id` - Get single product
+- **POST** `/products` - Create new product
+- **PUT** `/products/:id` - Update product
+- **DELETE** `/products/:id` - Delete product
+- **POST** `/orders` - Create new order
+- **GET** `/users` - Get users (for admin authentication)
 
-## Learn More
+## Brand Guidelines
 
-To learn more about Next.js, take a look at the following resources:
+The application follows Emzor's official branding:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Primary Color**: `#0057b8` (Emzor Blue)
+- **Secondary Color**: `#f37021` (Emzor Orange)
+- **Typography**: Poppins font family
+- **Theme**: Clean, professional light theme
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Development Scripts
 
-## Deploy on Vercel
+- `npm run dev` - Start both JSON server and Next.js development server
+- `npm run dev:server` - Start only JSON server (port 3001)
+- `npm run dev:client` - Start only Next.js development server (port 3000)
+- `npm run build` - Build the application for production
+- `npm start` - Start the production server
+- `npm run lint` - Run ESLint
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Features in Detail
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Customer Features
+- ✅ Product browsing and search
+- ✅ User registration and authentication
+- ✅ Protected shopping cart (login required)
+- ✅ Protected checkout process (login required)
+- ✅ Responsive design for all devices
+- ✅ Product categories and filtering
+- ✅ Order placement and confirmation
+- ✅ User account management
+
+### Admin Features
+- ✅ Secure admin login system
+- ✅ Product CRUD operations
+- ✅ Dashboard with statistics
+- ✅ Product management interface
+- ✅ Order management system
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## License
+
+This project is proprietary to Emzor Pharmaceutical.
+
+## Support
+
+For technical support or questions, please contact the development team.
