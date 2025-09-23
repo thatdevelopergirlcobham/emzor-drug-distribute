@@ -162,8 +162,7 @@ Use these credentials to test the application:
 emzor-distribution/
 ├── app/                    # Next.js app directory
 │   ├── admin/             # Admin routes (protected)
-│   ├── supervisor/        # Supervisor routes (protected)
-│   ├── student/           # Student routes (protected)
+│   ├── user/ 
 │   ├── login/             # Authentication pages
 │   ├── register/          # User registration
 │   └── ...                # Other public pages

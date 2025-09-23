@@ -82,9 +82,9 @@ function userReducer(state: UserState, action: UserAction): UserState {
 interface UserContextType {
   state: UserState;
   login: (email: string, password: string) => Promise<boolean>;
-  register: (userData: { name: string; email: string; password: string }) => Promise<boolean>;
+  register: (userData: { name: string; email: string; password: string; role: string }) => Promise<boolean>;
   logout: () => void;
-  addToCart: (product: any, quantity: number) => void;
+  addToCart: (product: CartItem['product'], quantity: number) => void;
   removeFromCart: (productId: string) => void;
   updateCartQuantity: (productId: string, quantity: number) => void;
   getCartTotal: () => number;
@@ -104,73 +104,52 @@ export function UserProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'SET_ERROR', payload: null });
 
     try {
-      const response = await fetch('http://localhost:3001/users');
-      const users: User[] = await response.json();
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-      const user = users.find(
-        u => u.email === email && u.password === password && u.role === 'CUSTOMER'
-      );
+      const data = await response.json();
 
-      if (user) {
-        const userWithoutPassword = { ...user };
-        delete (userWithoutPassword as any).password;
-
-        dispatch({ type: 'LOGIN_SUCCESS', payload: userWithoutPassword });
-        localStorage.setItem('user', JSON.stringify(userWithoutPassword));
+      if (response.ok && data.success) {
+        dispatch({ type: 'LOGIN_SUCCESS', payload: data.user });
         return true;
       }
 
-      dispatch({ type: 'SET_ERROR', payload: 'Invalid email or password' });
+      dispatch({ type: 'SET_ERROR', payload: data.message || 'Invalid email or password' });
       return false;
-    } catch (error) {
+    } catch {
       dispatch({ type: 'SET_ERROR', payload: 'Login failed. Please try again.' });
       return false;
     }
   }, []);
 
-  const register = useCallback(async (userData: { name: string; email: string; password: string }): Promise<boolean> => {
+  const register = useCallback(async (userData: { name: string; email: string; password: string; role: string }): Promise<boolean> => {
     dispatch({ type: 'SET_LOADING', payload: true });
     dispatch({ type: 'SET_ERROR', payload: null });
 
     try {
-      const response = await fetch('http://localhost:3001/users');
-      const users: User[] = await response.json();
-
-      const existingUser = users.find(u => u.email === userData.email);
-
-      if (existingUser) {
-        dispatch({ type: 'SET_ERROR', payload: 'User with this email already exists' });
-        return false;
-      }
-
-      const newUser: User = {
-        id: `user-${Date.now()}`,
-        name: userData.name,
-        email: userData.email,
-        password: userData.password,
-        role: 'CUSTOMER',
-      };
-
-      const createResponse = await fetch('http://localhost:3001/users', {
+      const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(newUser),
+        body: JSON.stringify(userData),
       });
 
-      if (createResponse.ok) {
-        const userWithoutPassword = { ...newUser };
-        delete (userWithoutPassword as any).password;
+      const data = await response.json();
 
-        dispatch({ type: 'LOGIN_SUCCESS', payload: userWithoutPassword });
-        localStorage.setItem('user', JSON.stringify(userWithoutPassword));
+      if (response.ok && data.success) {
+        dispatch({ type: 'LOGIN_SUCCESS', payload: data.user });
         return true;
       }
 
-      dispatch({ type: 'SET_ERROR', payload: 'Registration failed. Please try again.' });
+      dispatch({ type: 'SET_ERROR', payload: data.message || 'Registration failed. Please try again.' });
       return false;
-    } catch (error) {
+    } catch {
       dispatch({ type: 'SET_ERROR', payload: 'Registration failed. Please try again.' });
       return false;
     }
@@ -181,7 +160,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('user');
   }, []);
 
-  const addToCart = useCallback((product: any, quantity: number) => {
+  const addToCart = useCallback((product: CartItem['product'], quantity: number) => {
     const cartItem: CartItem = {
       product,
       quantity,
@@ -227,11 +206,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
         total,
         status: 'PENDING',
         shippingAddress: orderDetails.shippingAddress,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
-      const response = await fetch('http://localhost:3001/orders', {
+      const response = await fetch('/api/orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -263,7 +242,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       try {
         const user: User = JSON.parse(storedUser);
         dispatch({ type: 'LOGIN_SUCCESS', payload: user });
-      } catch (error) {
+      } catch {
         localStorage.removeItem('user');
       }
     }

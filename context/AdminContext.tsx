@@ -28,28 +28,24 @@ export function AdminProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback(async (credentials: LoginCredentials): Promise<boolean> => {
     try {
-      const response = await fetch('http://localhost:3001/users');
-      const users: User[] = await response.json();
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: credentials.email,
+          password: credentials.password,
+        }),
+      });
 
-      const user = users.find(
-        u => u.email === credentials.email && u.password === credentials.password
-      );
+      const data = await response.json();
 
-      if (user && user.role === 'ADMIN') {
-        const authUser: AuthUser = {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        };
-
+      if (response.ok && data.success && data.user.role === 'ADMIN') {
         setState({
-          currentUser: authUser,
+          currentUser: data.user,
           isAuthenticated: true,
         });
-
-        // Store in localStorage for persistence
-        localStorage.setItem('adminUser', JSON.stringify(authUser));
 
         return true;
       }
@@ -70,7 +66,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const addProduct = useCallback(async (productData: ProductFormData): Promise<Product> => {
-    const response = await fetch('http://localhost:3001/products', {
+    const response = await fetch('/api/products', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -86,7 +82,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const updateProduct = useCallback(async (id: string, productData: ProductFormData): Promise<Product> => {
-    const response = await fetch(`http://localhost:3001/products/${id}`, {
+    const response = await fetch(`/api/products/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -102,7 +98,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const deleteProduct = useCallback(async (id: string): Promise<void> => {
-    const response = await fetch(`http://localhost:3001/products/${id}`, {
+    const response = await fetch(`/api/products/${id}`, {
       method: 'DELETE',
     });
 

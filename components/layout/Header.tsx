@@ -2,14 +2,13 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { ShoppingCart, Search, Menu, LogOut } from 'lucide-react';
-import { useAdmin } from '@/context/AdminContext';
 import { useUser } from '@/context/UserContext';
 
 export default function Header() {
   const router = useRouter();
-  const { state: adminState, logout: adminLogout } = useAdmin();
+  const pathname = usePathname();
   const { state: userState, logout: userLogout } = useUser();
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -24,8 +23,25 @@ export default function Header() {
 
   const handleUserLogout = () => {
     userLogout();
-    adminLogout();
+    // Clear admin token if it exists
+    if (typeof window !== 'undefined') {
+      document.cookie = 'auth-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    }
     router.push('/');
+  };
+
+  // Check if current user is admin based on token
+  const isAdminUser = () => {
+    if (typeof window === 'undefined') return false;
+    const token = document.cookie.split(';').find(c => c.trim().startsWith('auth-token='));
+    if (!token) return false;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.role === 'ADMIN';
+    } catch {
+      return false;
+    }
   };
 
   return (
@@ -105,7 +121,7 @@ export default function Header() {
             )}
 
             {/* User/Admin Authentication */}
-            {adminState.isAuthenticated ? (
+            {isAdminUser() ? (
               <div className="flex items-center space-x-4">
                 <Link
                   href="/admin/dashboard"
