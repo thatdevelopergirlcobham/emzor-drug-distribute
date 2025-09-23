@@ -5,16 +5,18 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import Header from '@/components/layout/Header';
-import { useUser } from '@/context/UserContext';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { register } = useUser();
+  const { register } = useAuth();
+
   const [userData, setUserData] = useState({
     name: '',
     email: '',
     password: '',
     confirmPassword: '',
+    role: 'STUDENT' as 'ADMIN' | 'SUPERVISOR' | 'STUDENT',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -44,14 +46,28 @@ export default function RegisterPage() {
         name: userData.name,
         email: userData.email,
         password: userData.password,
+        role: userData.role,
       });
 
       if (success) {
-        router.push('/');
+        // Redirect based on role
+        switch (userData.role) {
+          case 'ADMIN':
+            router.push('/admin/dashboard');
+            break;
+          case 'SUPERVISOR':
+            router.push('/supervisor/dashboard');
+            break;
+          case 'STUDENT':
+            router.push('/student/dashboard');
+            break;
+          default:
+            router.push('/');
+        }
       } else {
         setError('Registration failed. Please try again.');
       }
-    } catch (err) {
+    } catch {
       setError('Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
@@ -62,6 +78,12 @@ export default function RegisterPage() {
     setUserData(prev => ({ ...prev, [field]: value }));
     if (error) setError('');
   };
+
+  const roles = [
+    { value: 'STUDENT', label: 'Student', description: 'Access student dashboard and assigned tasks' },
+    { value: 'SUPERVISOR', label: 'Supervisor', description: 'Manage task allocations and oversee students' },
+    { value: 'ADMIN', label: 'Administrator', description: 'Full system access and management' },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -83,7 +105,7 @@ export default function RegisterPage() {
               EMZOR
             </div>
             <h2 className="text-3xl font-bold text-gray-900">Create Account</h2>
-            <p className="text-gray-600 mt-2">Join us today and start shopping for quality healthcare products</p>
+            <p className="text-gray-600 mt-2">Join our platform and access your dashboard</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -102,7 +124,7 @@ export default function RegisterPage() {
                 required
                 value={userData.name}
                 onChange={(e) => handleInputChange('name', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-black"
                 placeholder="Enter your full name"
               />
             </div>
@@ -116,9 +138,30 @@ export default function RegisterPage() {
                 required
                 value={userData.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-black"
                 placeholder="Enter your email"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Role
+              </label>
+              <select
+                value={userData.role}
+                onChange={(e) => handleInputChange('role', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-black"
+                required
+              >
+                {roles.map((role) => (
+                  <option key={role.value} value={role.value}>
+                    {role.label}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-gray-500 mt-1">
+                {roles.find(r => r.value === userData.role)?.description}
+              </p>
             </div>
 
             <div>
@@ -131,7 +174,7 @@ export default function RegisterPage() {
                   required
                   value={userData.password}
                   onChange={(e) => handleInputChange('password', e.target.value)}
-                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-black"
                   placeholder="Create a password"
                 />
                 <button
@@ -154,7 +197,7 @@ export default function RegisterPage() {
                   required
                   value={userData.confirmPassword}
                   onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-black"
                   placeholder="Confirm your password"
                 />
                 <button
@@ -170,7 +213,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-blue-600 text-white disabled:bg-gray-400 py-3 px-4 rounded-lg font-semibold"
+              className="w-full bg-primary text-primary-foreground disabled:bg-gray-400 py-3 px-4 rounded-lg font-semibold"
             >
               {isLoading ? 'Creating Account...' : 'Create Account'}
             </button>
@@ -183,16 +226,6 @@ export default function RegisterPage() {
                 Sign in
               </Link>
             </p>
-          </div>
-
-          <div className="mt-6 p-4 bg-green-50 rounded-lg">
-            <h3 className="text-sm font-medium text-green-800 mb-2">Why Create an Account?</h3>
-            <ul className="text-sm text-green-700 space-y-1">
-              <li>• Faster checkout process</li>
-              <li>• Order history and tracking</li>
-              <li>• Save favorite products</li>
-              <li>• Exclusive member discounts</li>
-            </ul>
           </div>
         </div>
       </div>

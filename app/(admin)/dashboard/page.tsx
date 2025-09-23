@@ -1,67 +1,59 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Plus, Package, Users, ShoppingCart, DollarSign } from 'lucide-react';
 import ProductDataTable from '@/components/admin/ProductDataTable';
-import { useData } from '@/context/DataContext';
+import { useProducts } from '@/hooks/useProducts';
+import { useDashboardData } from '@/hooks/useDashboardData';
 
 export default function AdminDashboard() {
-  const { state, fetchProducts } = useData();
-  const [stats, setStats] = useState({
+  const { products } = useProducts();
+  const { stats } = useDashboardData();
+
+  const statsData = stats ? {
+    totalProducts: stats.totalProducts,
+    totalUsers: stats.totalUsers,
+    totalOrders: stats.totalOrders,
+    totalValue: products.reduce((sum, product) => sum + product.price, 0),
+    categories: new Set(products.map(product => product.category)).size,
+    lowStock: products.filter(product => (product.stock || 0) < 10).length,
+  } : {
     totalProducts: 0,
+    totalUsers: 0,
+    totalOrders: 0,
     totalValue: 0,
     categories: 0,
     lowStock: 0,
-  });
-
-  useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
-
-  useEffect(() => {
-    // Calculate stats
-    const totalProducts = state.products.length;
-    const totalValue = state.products.reduce((sum, product) => sum + product.price, 0);
-    const categories = new Set(state.products.map(product => product.category)).size;
-    const lowStock = state.products.filter(product => product.price < 300).length; // Example threshold
-
-    setStats({
-      totalProducts,
-      totalValue,
-      categories,
-      lowStock,
-    });
-  }, [state.products]);
+  };
 
   const statCards = [
     {
       title: 'Total Products',
-      value: stats.totalProducts,
+      value: statsData.totalProducts,
       icon: Package,
       color: 'bg-blue-500',
       description: 'Products in inventory',
     },
     {
-      title: 'Inventory Value',
-      value: `₦${stats.totalValue.toLocaleString()}`,
-      icon: DollarSign,
-      color: 'bg-green-500',
-      description: 'Total inventory value',
-    },
-    {
-      title: 'Categories',
-      value: stats.categories,
+      title: 'Total Users',
+      value: statsData.totalUsers,
       icon: Users,
-      color: 'bg-purple-500',
-      description: 'Product categories',
+      color: 'bg-green-500',
+      description: 'Registered users',
     },
     {
-      title: 'Low Value Items',
-      value: stats.lowStock,
+      title: 'Total Orders',
+      value: statsData.totalOrders,
       icon: ShoppingCart,
+      color: 'bg-purple-500',
+      description: 'Orders placed',
+    },
+    {
+      title: 'Inventory Value',
+      value: `₦${statsData.totalValue.toLocaleString()}`,
+      icon: DollarSign,
       color: 'bg-orange-500',
-      description: 'Items under ₦300',
+      description: 'Total inventory value',
     },
   ];
 
@@ -123,16 +115,22 @@ export default function AdminDashboard() {
               Add New Product
             </Link>
             <Link
+              href="/admin/users"
+              className="block p-3 bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors rounded-lg font-medium"
+            >
+              Manage Users
+            </Link>
+            <Link
               href="/admin/orders"
               className="block p-3 bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors rounded-lg font-medium"
             >
               View Orders
             </Link>
             <Link
-              href="/admin/reports"
+              href="/admin/allocations"
               className="block p-3 bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors rounded-lg font-medium"
             >
-              Generate Reports
+              Manage Allocations
             </Link>
           </div>
         </div>
@@ -141,16 +139,16 @@ export default function AdminDashboard() {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">System Status</h3>
           <div className="space-y-3">
             <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-              <span className="text-green-800 font-medium">Database</span>
+              <span className="text-green-800 font-medium">MongoDB</span>
               <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">Connected</span>
             </div>
             <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
               <span className="text-green-800 font-medium">API Status</span>
               <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">Operational</span>
             </div>
-            <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
-              <span className="text-yellow-800 font-medium">Last Backup</span>
-              <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-sm">2 hours ago</span>
+            <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+              <span className="text-blue-800 font-medium">Total Categories</span>
+              <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">{statsData.categories}</span>
             </div>
           </div>
         </div>

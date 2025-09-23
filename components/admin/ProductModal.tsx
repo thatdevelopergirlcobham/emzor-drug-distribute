@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { useAdmin } from '@/context/AdminContext';
 import { Product, ProductFormData } from '@/types';
@@ -213,10 +214,11 @@ export default function ProductModal({ isOpen, onClose, product }: ProductModalP
                   Image Preview
                 </label>
                 <div className="relative w-32 h-32 border border-gray-300 rounded-lg overflow-hidden">
-                  <img
+                  <Image
                     src={formData.imageUrl}
                     alt="Product preview"
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiM5Y2EzYWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbmFnZTwvdGV4dD48L3N2Zz4=';

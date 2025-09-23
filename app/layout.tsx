@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
+import { AuthProvider } from "@/hooks/useAuth";
 import { DataProvider } from "@/context/DataContext";
-import { AdminProvider } from "@/context/AdminContext";
-import { UserProvider } from "@/context/UserContext";
 import GrammarlyWarningSuppressor from "@/components/GrammarlyWarningSuppressor";
 import "./globals.css";
 
@@ -26,13 +25,11 @@ export default function RootLayout({
     <html lang="en">
       <body className={poppins.className}>
         <GrammarlyWarningSuppressor />
-        <UserProvider>
-          <AdminProvider>
-            <DataProvider>
-              {children}
-            </DataProvider>
-          </AdminProvider>
-        </UserProvider>
+        <AuthProvider>
+          <DataProvider>
+            {children}
+          </DataProvider>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -5,60 +5,57 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import Header from '@/components/layout/Header';
-import { useUser } from '@/context/UserContext';
-import { useAdmin } from '@/context/AdminContext';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get('redirect') || '/';
 
-  const { login: userLogin } = useUser();
-  const { login: adminLogin } = useAdmin();
+  const { login, loading, error: authError } = useAuth();
 
   const [credentials, setCredentials] = useState({
     email: '',
     password: '',
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [loginType, setLoginType] = useState<'user' | 'admin'>('user');
+  const [localError, setLocalError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setIsLoading(true);
+    setLocalError('');
 
     try {
-      let success = false;
+      const success = await login(credentials);
 
-      if (loginType === 'admin') {
-        success = await adminLogin(credentials);
-        if (success) {
-          router.push('/admin/dashboard');
-          return;
-        }
-      } else {
-        success = await userLogin(credentials.email, credentials.password);
-        if (success) {
-          router.push(redirectTo);
-          return;
+      if (success) {
+        // Redirect based on user role
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        switch (user.role) {
+          case 'ADMIN':
+            router.push('/admin/dashboard');
+            break;
+          case 'SUPERVISOR':
+            router.push('/supervisor/dashboard');
+            break;
+          case 'STUDENT':
+            router.push('/student/dashboard');
+            break;
+          default:
+            router.push(redirectTo);
         }
       }
-
-      setError(loginType === 'admin' ? 'Invalid admin credentials' : 'Invalid email or password');
     } catch {
-      setError('Login failed. Please try again.');
-    } finally {
-      setIsLoading(false);
+      setLocalError('Login failed. Please try again.');
     }
   };
 
   const handleInputChange = (field: string, value: string) => {
     setCredentials(prev => ({ ...prev, [field]: value }));
-    if (error) setError('');
+    if (localError) setLocalError('');
   };
+
+  const error = localError || authError;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -76,37 +73,11 @@ export default function LoginPage() {
 
         <div className="bg-white py-8 px-6 shadow-lg rounded-lg">
           <div className="text-center mb-8">
-            <div className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-2xl inline-block mb-4">
+            <div className="bg-primary text-primary-foreground px-4 py-2 rounded-lg font-bold text-2xl inline-block mb-4">
               EMZOR
             </div>
             <h2 className="text-3xl font-bold text-gray-900">Sign In</h2>
-            <p className="text-gray-600 mt-2">Access your account to continue shopping</p>
-          </div>
-
-          {/* Login Type Toggle */}
-          <div className="flex mb-6 bg-gray-100 rounded-lg p-1">
-            <button
-              type="button"
-              onClick={() => setLoginType('user')}
-              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                loginType === 'user'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              Customer Login
-            </button>
-            <button
-              type="button"
-              onClick={() => setLoginType('admin')}
-              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                loginType === 'admin'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              Admin Login
-            </button>
+            <p className="text-gray-600 mt-2">Access your dashboard</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -125,7 +96,7 @@ export default function LoginPage() {
                 required
                 value={credentials.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-black"
                 placeholder="Enter your email"
               />
             </div>
@@ -140,7 +111,7 @@ export default function LoginPage() {
                   required
                   value={credentials.password}
                   onChange={(e) => handleInputChange('password', e.target.value)}
-                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-black"
                   placeholder="Enter your password"
                 />
                 <button
@@ -155,17 +126,17 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              disabled={isLoading}
-              className="w-full bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-400 transition-colors py-3 px-4 rounded-lg font-semibold"
+              disabled={loading}
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-gray-400 transition-colors py-3 px-4 rounded-lg font-semibold"
             >
-              {isLoading ? 'Signing in...' : `Sign In as ${loginType === 'admin' ? 'Admin' : 'Customer'}`}
+              {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-gray-600">
               Don&apos;t have an account?{' '}
-              <Link href="/register" className="text-blue-600 hover:underline font-medium">
+              <Link href="/register" className="text-primary hover:underline font-medium">
                 Sign up
               </Link>
             </p>
@@ -174,7 +145,7 @@ export default function LoginPage() {
           {/* Demo Credentials */}
           <div className="mt-6 p-4 bg-blue-50 rounded-lg">
             <h3 className="text-sm font-medium text-blue-800 mb-2">Demo Credentials</h3>
-            {loginType === 'admin' ? (
+            <div className="space-y-2">
               <div>
                 <p className="text-sm text-blue-700 mb-1">
                   <strong>Admin:</strong>
@@ -186,19 +157,29 @@ export default function LoginPage() {
                   Password: <code className="bg-blue-100 px-1 rounded">password</code>
                 </p>
               </div>
-            ) : (
               <div>
                 <p className="text-sm text-blue-700 mb-1">
-                  <strong>Customer:</strong>
+                  <strong>Supervisor:</strong>
                 </p>
                 <p className="text-sm text-blue-700">
-                  Email: <code className="bg-blue-100 px-1 rounded">user@example.com</code>
+                  Email: <code className="bg-blue-100 px-1 rounded">supervisor@emzor.com</code>
                 </p>
                 <p className="text-sm text-blue-700">
                   Password: <code className="bg-blue-100 px-1 rounded">password</code>
                 </p>
               </div>
-            )}
+              <div>
+                <p className="text-sm text-blue-700 mb-1">
+                  <strong>Student:</strong>
+                </p>
+                <p className="text-sm text-blue-700">
+                  Email: <code className="bg-blue-100 px-1 rounded">student@emzor.com</code>
+                </p>
+                <p className="text-sm text-blue-700">
+                  Password: <code className="bg-blue-100 px-1 rounded">password</code>
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

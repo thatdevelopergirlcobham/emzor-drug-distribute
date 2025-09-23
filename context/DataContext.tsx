@@ -68,11 +68,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'SET_ERROR', payload: null });
 
     try {
-      const response = await fetch('http://localhost:3001/products');
+      const response = await fetch('/api/products');
       if (!response.ok) {
         throw new Error('Failed to fetch products');
       }
-      const products: Product[] = await response.json();
+      const result = await response.json();
+      const products: Product[] = result.data || [];
       dispatch({ type: 'SET_PRODUCTS', payload: products });
     } catch (error) {
       dispatch({ type: 'SET_ERROR', payload: error instanceof Error ? error.message : 'An error occurred' });

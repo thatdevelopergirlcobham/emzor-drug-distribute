@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
 
-export default function AdminLayout({
+export default function SupervisorLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -35,7 +35,7 @@ export default function AdminLayout({
     );
   }
 
-  if (!user || user.role !== 'ADMIN') {
+  if (!user || user.role !== 'SUPERVISOR') {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -58,7 +58,7 @@ export default function AdminLayout({
               <div className="bg-primary text-primary-foreground px-3 py-1 rounded-lg font-bold text-xl">
                 EMZOR
               </div>
-              <span className="text-gray-600 font-medium">Admin Dashboard</span>
+              <span className="text-gray-600 font-medium">Supervisor Dashboard</span>
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-gray-700">Welcome, {user.name}</span>

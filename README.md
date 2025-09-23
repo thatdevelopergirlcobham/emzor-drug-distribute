@@ -1,42 +1,55 @@
-# Emzor Pharmaceutical E-Commerce Website
+# Emzor Pharmaceutical Distribution System
 
-A complete and professional e-commerce website for Emzor Pharmaceutical built with Next.js, TypeScript, and Tailwind CSS.
+A complete pharmaceutical distribution management system with role-based dashboards built with Next.js, TypeScript, MongoDB, and Tailwind CSS.
 
 ## Features
 
-### 🛍️ E-Commerce Functionality
-- **Product Catalog**: Browse, search, and filter products
-- **Shopping Cart**: Add, remove, and update quantities
-- **Checkout Process**: Complete order placement with shipping and payment forms
-- **Product Details**: Detailed product pages with images and descriptions
-- **Category Navigation**: Organized product categories
+### 🔐 Authentication & Authorization
+- **Multi-Role Authentication**: Admin, Supervisor, and Student roles
+- **Secure Login/Registration**: JWT-based authentication with bcrypt password hashing
+- **Role-Based Access Control**: Conditional rendering based on user roles
+- **Persistent Sessions**: Automatic login state management
 
 ### 👨‍💼 Admin Dashboard
-- **Product Management**: Add, edit, and delete products
-- **Inventory Tracking**: Monitor product inventory and statistics
-- **User Authentication**: Secure admin login system
-- **Order Management**: View and manage customer orders
+- **User Management**: Create, edit, and delete user accounts
+- **Product Management**: Full CRUD operations on products with live inventory tracking
+- **Order Management**: View and manage all customer orders
+- **System Statistics**: Real-time dashboard with MongoDB data
+- **Allocation Management**: Oversee task allocations and assignments
 
-### 🎨 Design & UX
-- **Responsive Design**: Works on desktop, tablet, and mobile
-- **Modern UI**: Clean, professional design with Emzor branding
-- **Interactive Elements**: Smooth animations and transitions
-- **Accessibility**: Built with accessibility best practices
+### 👨‍🏫 Supervisor Dashboard
+- **Task Allocation**: Create and assign tasks to students
+- **Progress Tracking**: Monitor student progress on assigned tasks
+- **Student Management**: View and manage assigned students
+- **Performance Analytics**: Track completion rates and overdue tasks
+
+### 🎓 Student Dashboard
+- **Task Management**: View assigned tasks and update progress
+- **Personal Dashboard**: Track personal performance and deadlines
+- **Progress Updates**: Update task status and completion
+- **Due Date Tracking**: Monitor upcoming and overdue assignments
+
+### 🛍️ E-Commerce Features
+- **Product Catalog**: Browse pharmaceutical products with categories
+- **Shopping Cart**: Add and manage products (login required)
+- **Order Processing**: Complete checkout with shipping details
+- **User Accounts**: Registration and profile management
 
 ## Technology Stack
 
 - **Frontend**: Next.js 14, React 18, TypeScript
 - **Styling**: Tailwind CSS with custom Emzor brand colors
+- **Database**: MongoDB with Mongoose ODM
+- **Authentication**: JWT tokens with bcrypt password hashing
+- **State Management**: React Context API with custom hooks
 - **Icons**: Lucide React
-- **State Management**: React Context API
-- **Backend**: JSON Server (mock API)
-- **Development**: Concurrently for running multiple servers
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 18+
+- MongoDB (local installation or cloud instance)
 - npm or yarn
 
 ### Installation
@@ -52,115 +65,174 @@ A complete and professional e-commerce website for Emzor Pharmaceutical built wi
    npm install
    ```
 
-3. **Start the development servers**
+3. **Set up environment variables**
+   ```bash
+   cp .env.example .env.local
+   ```
+
+   Edit `.env.local` and add your MongoDB connection string:
+   ```env
+   MONGODB_URI=mongodb://localhost:27017/emzor-distribution
+   # or for cloud MongoDB:
+   # MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/emzor-distribution
+
+   JWT_SECRET=your-super-secret-jwt-key-here
+   JWT_EXPIRES_IN=7d
+   NEXTAUTH_URL=http://localhost:3000
+   NEXTAUTH_SECRET=your-nextauth-secret-here
+   ```
+
+4. **Start the development server**
    ```bash
    npm run dev
    ```
 
-This will start both the JSON server (on port 3001) and the Next.js development server (on port 3000).
+The application will be available at `http://localhost:3000`.
 
-### Admin Access
+### MongoDB Setup
 
-To access the admin dashboard:
+1. **Local MongoDB**:
+   - Install MongoDB Community Edition
+   - Start MongoDB service: `mongod`
+   - The app will automatically create the required collections
 
-1. Go to `/login`
-2. Click on "Admin Login" tab
-3. Use the following credentials:
-   - **Email**: `admin@emzor.com`
-   - **Password**: `password`
+2. **Cloud MongoDB** (Recommended):
+   - Create a MongoDB Atlas account
+   - Create a new cluster
+   - Get your connection string from the cluster settings
+   - Replace `MONGODB_URI` in `.env.local`
 
-### User Authentication
+### Initial Admin User
 
-To test user authentication:
+To create the first admin user, you can register through the application:
+- Go to `/register`
+- Select "Administrator" as the role
+- Fill in your details
+- Use the admin credentials to access the admin dashboard
 
-1. **Customer Login**: Go to `/login` and use "Customer Login" tab
-   - **Email**: `user@example.com`
-   - **Password**: `password`
+## User Roles & Access
 
-2. **User Registration**: Go to `/register` to create new accounts
+### 👨‍💼 Administrator
+- **Access**: Full system access
+- **Dashboard**: `/admin/dashboard`
+- **Features**: User management, product management, order management, system statistics
+- **Permissions**: Create/edit/delete users, products, orders, allocations
 
-### Cart & Checkout Access
+### 👨‍🏫 Supervisor
+- **Access**: Task allocation and student management
+- **Dashboard**: `/supervisor/dashboard`
+- **Features**: Create allocations, monitor student progress, generate reports
+- **Permissions**: Create/manage task allocations, view assigned students
 
-- **Cart**: `/cart` - Requires user authentication
-- **Checkout**: `/checkout` - Requires user authentication
-- Unauthenticated users will be redirected to login page
+### 🎓 Student
+- **Access**: Personal task management
+- **Dashboard**: `/student/dashboard`
+- **Features**: View assigned tasks, update progress, track deadlines
+- **Permissions**: Update task status, view personal assignments
+
+## Authentication Flow
+
+1. **Registration**: Users can register with any role (Admin/Supervisor/Student)
+2. **Login**: Unified login page with role-based redirection
+3. **Dashboard Access**: Automatic redirection to appropriate dashboard based on role
+4. **Session Management**: JWT tokens stored in localStorage with automatic refresh
+
+## Demo Credentials
+
+Use these credentials to test the application:
+
+### Administrator
+- **Email**: `admin@emzor.com`
+- **Password**: `password`
+- **Access**: Admin dashboard with full system access
+
+### Supervisor
+- **Email**: `supervisor@emzor.com`
+- **Password**: `password`
+- **Access**: Supervisor dashboard for task allocation
+
+### Student
+- **Email**: `student@emzor.com`
+- **Password**: `password`
+- **Access**: Student dashboard for task management
 
 ## Project Structure
 
 ```
 emzor-distribution/
 ├── app/                    # Next.js app directory
-│   ├── (admin)/           # Admin routes (protected)
-│   ├── admin/login/       # Admin login page
-│   ├── cart/              # Shopping cart page (protected)
-│   ├── checkout/          # Checkout page (protected)
-│   ├── login/             # User/Admin login page
-│   ├── register/          # User registration page
-│   ├── account/           # User account page
-│   ├── products/          # Products listing and detail pages
-│   └── ...                # Other pages
+│   ├── admin/             # Admin routes (protected)
+│   ├── supervisor/        # Supervisor routes (protected)
+│   ├── student/           # Student routes (protected)
+│   ├── login/             # Authentication pages
+│   ├── register/          # User registration
+│   └── ...                # Other public pages
 ├── components/            # React components
-│   ├── admin/            # Admin-specific components
-│   ├── layout/           # Layout components (Header, etc.)
-│   ├── products/         # Product-related components
-│   └── shared/           # Shared/reusable components
-├── context/              # React Context providers
-│   ├── UserContext.tsx   # User authentication and cart
-│   ├── AdminContext.tsx  # Admin authentication
-│   └── DataContext.tsx   # Product data management
-├── types/               # TypeScript type definitions
-├── db.json             # Mock database
-└── public/             # Static assets
+│   ├── layout/           # Layout components
+│   └── ...               # Feature-specific components
+├── hooks/                # Custom React hooks
+│   ├── useAuth.ts        # Authentication hook
+│   ├── useUsers.ts       # User management hook
+│   ├── useProducts.ts    # Product management hook
+│   ├── useOrders.ts      # Order management hook
+│   └── useAllocations.ts # Task allocation hook
+├── lib/                  # Utility libraries
+│   └── mongodb.ts        # Database connection and models
+└── types/               # TypeScript type definitions
 ```
 
-## API Endpoints
+## API Integration
 
-The application uses JSON Server as a mock backend running on `http://localhost:3001`:
+The application uses MongoDB as the backend database with the following models:
 
-- **GET** `/products` - Get all products
-- **GET** `/products/:id` - Get single product
-- **POST** `/products` - Create new product
-- **PUT** `/products/:id` - Update product
-- **DELETE** `/products/:id` - Delete product
-- **POST** `/orders` - Create new order
-- **GET** `/users` - Get users (for admin authentication)
+- **Users**: Authentication and role management
+- **Products**: Pharmaceutical product catalog
+- **Orders**: Customer order management
+- **Allocations**: Task assignment system
 
-## Brand Guidelines
-
-The application follows Emzor's official branding:
-
-- **Primary Color**: `#0057b8` (Emzor Blue)
-- **Secondary Color**: `#f37021` (Emzor Orange)
-- **Typography**: Poppins font family
-- **Theme**: Clean, professional light theme
+All data operations are handled through custom React hooks that provide:
+- Real-time data fetching
+- Optimistic updates
+- Error handling
+- Loading states
 
 ## Development Scripts
 
-- `npm run dev` - Start both JSON server and Next.js development server
-- `npm run dev:server` - Start only JSON server (port 3001)
-- `npm run dev:client` - Start only Next.js development server (port 3000)
+- `npm run dev` - Start the development server
 - `npm run build` - Build the application for production
-- `npm start` - Start the production server
+- `npm run start` - Start the production server
 - `npm run lint` - Run ESLint
 
 ## Features in Detail
 
-### Customer Features
-- ✅ Product browsing and search
-- ✅ User registration and authentication
-- ✅ Protected shopping cart (login required)
-- ✅ Protected checkout process (login required)
-- ✅ Responsive design for all devices
-- ✅ Product categories and filtering
-- ✅ Order placement and confirmation
-- ✅ User account management
+### User Management
+- ✅ Role-based user registration
+- ✅ Secure password hashing with bcrypt
+- ✅ JWT-based authentication
+- ✅ Session persistence
+- ✅ Role-based access control
 
-### Admin Features
-- ✅ Secure admin login system
-- ✅ Product CRUD operations
-- ✅ Dashboard with statistics
-- ✅ Product management interface
-- ✅ Order management system
+### Dashboard Features
+- ✅ Real-time data from MongoDB
+- ✅ Role-specific dashboards
+- ✅ Interactive data tables
+- ✅ Statistics and analytics
+- ✅ Progress tracking
+
+### Task Allocation System
+- ✅ Create and assign tasks
+- ✅ Priority levels (Low/Medium/High)
+- ✅ Due date tracking
+- ✅ Status updates (Pending/In Progress/Completed)
+- ✅ Overdue task alerts
+
+## Security Features
+
+- **Password Security**: bcrypt hashing with salt rounds
+- **JWT Authentication**: Secure token-based authentication
+- **Role-Based Access**: Server-side route protection
+- **Input Validation**: Comprehensive form validation
+- **Error Handling**: Secure error messages without data leakage
 
 ## Contributing
 

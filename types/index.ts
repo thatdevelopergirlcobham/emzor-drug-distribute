@@ -1,18 +1,25 @@
+export interface User {
+  _id?: string;
+  id: string;
+  name: string;
+  email: string;
+  password: string;
+  role: 'ADMIN' | 'SUPERVISOR' | 'STUDENT';
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
 export interface Product {
+  _id?: string;
   id: string;
   name: string;
   category: string;
   price: number;
   description: string;
   imageUrl: string;
-}
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  password: string;
-  role: 'ADMIN' | 'CUSTOMER';
+  stock?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface CartItem {
@@ -27,14 +34,15 @@ export interface OrderItem {
 }
 
 export interface Order {
+  _id?: string;
   id: string;
   userId: string;
   items: OrderItem[];
   total: number;
   status: 'PENDING' | 'CONFIRMED' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
   shippingAddress: ShippingAddress;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface ShippingAddress {
@@ -57,7 +65,7 @@ export interface AuthUser {
   id: string;
   name: string;
   email: string;
-  role: 'ADMIN' | 'CUSTOMER';
+  role: 'ADMIN' | 'SUPERVISOR' | 'STUDENT';
 }
 
 export interface ApiResponse<T> {
@@ -77,4 +85,38 @@ export interface ProductFormData {
   price: number;
   description: string;
   imageUrl: string;
+  stock?: number;
+}
+
+// Allocation interface for Supervisor role
+export interface Allocation {
+  _id?: string;
+  id: string;
+  title: string;
+  description: string;
+  assignedTo: string; // User ID
+  assignedBy: string; // Supervisor ID
+  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  priority: 'LOW' | 'MEDIUM' | 'HIGH';
+  dueDate?: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+// Dashboard statistics
+export interface DashboardStats {
+  totalUsers: number;
+  totalProducts: number;
+  totalOrders: number;
+  totalAllocations: number;
+  recentOrders: Order[];
+  recentAllocations: Allocation[];
+}
+
+// User registration data
+export interface RegisterData {
+  name: string;
+  email: string;
+  password: string;
+  role: 'ADMIN' | 'SUPERVISOR' | 'STUDENT';
 }
