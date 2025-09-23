@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Search, Grid, List } from 'lucide-react';
 import Header from '@/components/layout/Header';
@@ -9,6 +9,14 @@ import { useData } from '@/context/DataContext';
 import { Product } from '@/types';
 
 export default function ProductsPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center">Loading products...</div>}>
+      <ProductsPageInner />
+    </Suspense>
+  );
+}
+
+function ProductsPageInner() {
   const searchParams = useSearchParams();
   const { state, fetchProducts } = useData();
   const [searchTerm, setSearchTerm] = useState(searchParams.get('q') || '');
@@ -29,7 +37,6 @@ export default function ProductsPage() {
   useEffect(() => {
     let filtered = state.products;
 
-    // Apply search filter
     if (searchTerm) {
       filtered = filtered.filter(product =>
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -38,12 +45,10 @@ export default function ProductsPage() {
       );
     }
 
-    // Apply category filter
     if (selectedCategory) {
       filtered = filtered.filter(product => product.category === selectedCategory);
     }
 
-    // Apply sorting
     filtered.sort((a, b) => {
       switch (sortBy) {
         case 'price-low':

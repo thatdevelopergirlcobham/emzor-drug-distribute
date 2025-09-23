@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
+import mongoose from 'mongoose';
 import { Product, ProductFormData } from '@/types';
 import { ProductModel } from '@/lib/mongodb';
 
@@ -8,6 +9,20 @@ interface ProductsState {
   products: Product[];
   loading: boolean;
   error: string | null;
+}
+
+// MongoDB document interface for Product
+interface MongoProductDocument {
+  _id: mongoose.Types.ObjectId;
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  description: string;
+  imageUrl: string;
+  stock?: number;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export function useProducts() {
@@ -21,10 +36,10 @@ export function useProducts() {
     setState(prev => ({ ...prev, loading: true, error: null }));
 
     try {
-      const products = await ProductModel.find().sort({ createdAt: -1 }).lean();
+      const products = await ProductModel.find().sort({ createdAt: -1 }).lean() as unknown as MongoProductDocument[];
 
       const formattedProducts: Product[] = products.map(product => ({
-        _id: product._id?.toString(),
+        _id: product._id.toString(),
         id: product.id,
         name: product.name,
         category: product.category,
@@ -55,10 +70,10 @@ export function useProducts() {
       const newProduct = await ProductModel.create({
         id: `prod-${Date.now()}`,
         ...productData,
-      });
+      }) as MongoProductDocument;
 
       const formattedProduct: Product = {
-        _id: newProduct._id?.toString(),
+        _id: newProduct._id.toString(),
         id: newProduct.id,
         name: newProduct.name,
         category: newProduct.category,
@@ -91,14 +106,14 @@ export function useProducts() {
         { id },
         { ...productData, updatedAt: new Date() },
         { new: true }
-      ).lean();
+      ).lean() as unknown as MongoProductDocument | null;
 
       if (!updatedProduct) {
         throw new Error('Product not found');
       }
 
       const formattedProduct: Product = {
-        _id: updatedProduct._id?.toString(),
+        _id: updatedProduct._id.toString(),
         id: updatedProduct.id,
         name: updatedProduct.name,
         category: updatedProduct.category,
@@ -129,7 +144,7 @@ export function useProducts() {
 
   const deleteProduct = useCallback(async (id: string): Promise<boolean> => {
     try {
-      const result = await ProductModel.findOneAndDelete({ id });
+      const result = await ProductModel.findOneAndDelete({ id }) as unknown as MongoProductDocument | null;
 
       if (!result) {
         throw new Error('Product not found');

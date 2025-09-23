@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAdmin } from '@/context/AdminContext';
-import { useDashboardData } from '@/hooks/useDashboardData';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/shared/card';
 import { Button } from '@/components/shared/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/shared/tabs';
@@ -12,61 +11,60 @@ import {
   ShoppingCart,
   Plus,
   Settings,
-  LogOut,
-  AlertTriangle
+  LogOut
 } from 'lucide-react';
 
 export default function AdminDashboard() {
   const { state, logout } = useAdmin();
-  const { data: dashboardData, loading, error } = useDashboardData();
+  // const { data: dashboardData, loading, error } = useDashboardData();
   const [activeTab, setActiveTab] = useState('overview');
 
-  useEffect(() => {
-    if (!state.isAuthenticated) {
-      window.location.href = '/admin/login';
-    }
-  }, [state.isAuthenticated]);
+  // useEffect(() => {
+  //   if (!state.isAuthenticated) {
+  //     window.location.href = '/admin/login';
+  //   }
+  // }, [state.isAuthenticated]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading dashboard...</p>
-        </div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+  //       <div className="text-center">
+  //         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+  //         <p className="text-gray-600">Loading dashboard...</p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <p className="text-gray-600">Error loading dashboard: {error}</p>
-        </div>
-      </div>
-    );
-  }
+  // if (error) {
+  //   return (
+  //     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+  //       <div className="text-center">
+  //         <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+  //         <p className="text-gray-600">Error loading dashboard: {error}</p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   const stats = [
     {
       title: 'Total Users',
-      value: dashboardData?.totalUsers || 0,
+      value: 0, // dashboardData?.totalUsers || 0,
       icon: Users,
       color: 'text-blue-600',
       bgColor: 'bg-blue-100',
     },
     {
       title: 'Total Products',
-      value: dashboardData?.totalProducts || 0,
+      value: 0, // dashboardData?.totalProducts || 0,
       icon: Package,
       color: 'text-green-600',
       bgColor: 'bg-green-100',
     },
     {
       title: 'Total Orders',
-      value: dashboardData?.totalOrders || 0,
+      value: 0, // dashboardData?.totalOrders || 0,
       icon: ShoppingCart,
       color: 'text-purple-600',
       bgColor: 'bg-purple-100',
@@ -138,33 +136,7 @@ export default function AdminDashboard() {
                   <CardDescription>Latest customer orders</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {dashboardData?.recentOrders && dashboardData.recentOrders.length > 0 ? (
-                    <div className="space-y-4">
-                      {dashboardData.recentOrders.slice(0, 5).map((order) => (
-                        <div key={order.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                          <div>
-                            <p className="font-medium text-gray-900">Order #{order.id.slice(-8)}</p>
-                            <p className="text-sm text-gray-600">
-                              {order.items.length} items • ₦{order.total.toLocaleString()}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <span className={`px-2 py-1 text-xs rounded-full ${
-                              order.status === 'DELIVERED'
-                                ? 'bg-green-100 text-green-800'
-                                : order.status === 'SHIPPED'
-                                ? 'bg-blue-100 text-blue-800'
-                                : 'bg-yellow-100 text-yellow-800'
-                            }`}>
-                              {order.status}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-gray-500 text-center py-4">No recent orders</p>
-                  )}
+                  <p className="text-gray-500 text-center py-4">No recent orders</p>
                 </CardContent>
               </Card>
 

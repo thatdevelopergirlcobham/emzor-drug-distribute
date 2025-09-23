@@ -1,13 +1,28 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
-import { DashboardStats } from '@/types';
-import { UserModel, ProductModel, OrderModel, AllocationModel } from '@/lib/mongodb';
+import { useState, useCallback } from 'react';
+import mongoose from 'mongoose';
+import { DashboardStats, Order, OrderItem, ShippingAddress } from '@/types';
+import { UserModel, ProductModel, OrderModel } from '@/lib/mongodb';
 
 interface DashboardState {
   stats: DashboardStats | null;
   loading: boolean;
   error: string | null;
+}
+
+// MongoDB document interface for Order (dashboard context)
+interface MongoOrderDocument {
+  _id: mongoose.Types.ObjectId;
+  id: string;
+  userId: string;
+  items: any[];
+  total: number;
+  status: string;
+  shippingAddress: any;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export function useDashboardData() {
@@ -21,52 +36,34 @@ export function useDashboardData() {
     setState(prev => ({ ...prev, loading: true, error: null }));
 
     try {
-      const [totalUsers, totalProducts, totalOrders, totalAllocations] = await Promise.all([
+      const [totalUsers, totalProducts, totalOrders] = await Promise.all([
         UserModel.countDocuments(),
         ProductModel.countDocuments(),
         OrderModel.countDocuments(),
-        AllocationModel.countDocuments(),
       ]);
 
       const recentOrders = await OrderModel.find()
         .sort({ createdAt: -1 })
         .limit(5)
-        .lean();
-
-      const recentAllocations = await AllocationModel.find()
-        .sort({ createdAt: -1 })
-        .limit(5)
-        .lean();
+        .lean() as unknown as MongoOrderDocument[];
 
       const stats: DashboardStats = {
         totalUsers,
         totalProducts,
         totalOrders,
-        totalAllocations,
-        recentOrders: recentOrders.map((order: any) => ({
-          _id: order._id?.toString(),
+        totalAllocations: 0,
+        recentAllocations: [],
+        recentOrders: recentOrders.map((order) => ({
+          _id: order._id.toString(),
           id: order.id,
           userId: order.userId,
-          items: order.items,
+          items: order.items as OrderItem[],
           total: order.total,
-          status: order.status,
-          shippingAddress: order.shippingAddress,
+          status: order.status as Order['status'],
+          shippingAddress: order.shippingAddress as ShippingAddress,
           createdAt: order.createdAt,
           updatedAt: order.updatedAt,
-        })),
-        recentAllocations: recentAllocations.map((allocation: any) => ({
-          _id: allocation._id?.toString(),
-          id: allocation.id,
-          title: allocation.title,
-          description: allocation.description,
-          assignedTo: allocation.assignedTo,
-          assignedBy: allocation.assignedBy,
-          status: allocation.status,
-          priority: allocation.priority,
-          dueDate: allocation.dueDate,
-          createdAt: allocation.createdAt,
-          updatedAt: allocation.updatedAt,
-        })),
+        }))
       };
 
       setState(prev => ({
@@ -82,10 +79,6 @@ export function useDashboardData() {
       }));
     }
   }, []);
-
-  useEffect(() => {
-    fetchDashboardStats();
-  }, [fetchDashboardStats]);
 
   return {
     ...state,

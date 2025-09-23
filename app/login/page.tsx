@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
@@ -8,6 +8,14 @@ import Header from '@/components/layout/Header';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center">Loading login...</div>}>
+      <LoginPageInner />
+    </Suspense>
+  );
+}
+
+function LoginPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get('redirect') || '/';
@@ -57,7 +65,11 @@ export default function LoginPage() {
             <p className="text-gray-500 mt-1">Sign in to continue</p>
           </div>
 
-          {error && <p className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm mb-4">{error}</p>}
+          {error && (
+            <p className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm mb-4">
+              {error}
+            </p>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <InputField
@@ -98,11 +110,17 @@ export default function LoginPage() {
   );
 }
 
-function InputField({ label, ...props }: React.InputHTMLAttributes<HTMLInputElement> & { label: string }) {
+function InputField({
+  label,
+  ...props
+}: React.InputHTMLAttributes<HTMLInputElement> & { label: string }) {
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-      <input {...props} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary text-black" />
+      <input
+        {...props}
+        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary text-black"
+      />
     </div>
   );
 }
@@ -133,7 +151,11 @@ function PasswordField({
           placeholder={placeholder}
           className="w-full px-3 py-2 pr-10 border rounded-lg focus:ring-2 focus:ring-primary text-black"
         />
-        <button type="button" onClick={toggle} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+        <button
+          type="button"
+          onClick={toggle}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+        >
           {show ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
         </button>
       </div>

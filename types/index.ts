@@ -4,7 +4,7 @@ export interface User {
   name: string;
   email: string;
   password: string;
-  role: 'ADMIN' | 'USER';
+  role: 'ADMIN' | 'USER' | 'SUPERVISOR' | 'STUDENT';
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -65,7 +65,7 @@ export interface AuthUser {
   id: string;
   name: string;
   email: string;
-  role: 'ADMIN' | 'USER';
+  role: 'ADMIN' | 'USER' | 'SUPERVISOR' | 'STUDENT';
 }
 
 export interface ApiResponse<T> {
@@ -118,5 +118,5 @@ export interface RegisterData {
   name: string;
   email: string;
   password: string;
-  role: 'ADMIN' | 'USER';
+  role: 'ADMIN' | 'USER' | 'SUPERVISOR' | 'STUDENT';
 }

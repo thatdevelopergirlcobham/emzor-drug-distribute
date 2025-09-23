@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
+import mongoose from 'mongoose';
 import { Order, OrderItem, ShippingAddress } from '@/types';
 import { OrderModel } from '@/lib/mongodb';
 
@@ -8,6 +10,19 @@ interface OrdersState {
   orders: Order[];
   loading: boolean;
   error: string | null;
+}
+
+// MongoDB document interface for Order
+interface MongoOrderDocument {
+  _id: mongoose.Types.ObjectId;
+  id: string;
+  userId: string;
+  items: any[];
+  total: number;
+  status: string;
+  shippingAddress: any;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export function useOrders() {
@@ -21,15 +36,15 @@ export function useOrders() {
     setState(prev => ({ ...prev, loading: true, error: null }));
 
     try {
-      const orders = await OrderModel.find().sort({ createdAt: -1 }).lean();
+      const orders = await OrderModel.find().sort({ createdAt: -1 }).lean() as unknown as MongoOrderDocument[];
 
       const formattedOrders: Order[] = orders.map(order => ({
-        _id: order._id?.toString(),
+        _id: order._id.toString(),
         id: order.id,
         userId: order.userId,
         items: order.items as OrderItem[],
         total: order.total,
-        status: order.status,
+        status: order.status as Order['status'],
         shippingAddress: order.shippingAddress as ShippingAddress,
         createdAt: order.createdAt,
         updatedAt: order.updatedAt,
@@ -59,15 +74,15 @@ export function useOrders() {
       const newOrder = await OrderModel.create({
         id: `order-${Date.now()}`,
         ...orderData,
-      });
+      }) as MongoOrderDocument;
 
       const formattedOrder: Order = {
-        _id: newOrder._id?.toString(),
+        _id: newOrder._id.toString(),
         id: newOrder.id,
         userId: newOrder.userId,
         items: newOrder.items as OrderItem[],
         total: newOrder.total,
-        status: newOrder.status,
+        status: newOrder.status as Order['status'],
         shippingAddress: newOrder.shippingAddress as ShippingAddress,
         createdAt: newOrder.createdAt,
         updatedAt: newOrder.updatedAt,
@@ -94,19 +109,19 @@ export function useOrders() {
         { id },
         { status, updatedAt: new Date() },
         { new: true }
-      ).lean();
+      ).lean() as unknown as MongoOrderDocument | null;
 
       if (!updatedOrder) {
         throw new Error('Order not found');
       }
 
       const formattedOrder: Order = {
-        _id: updatedOrder._id?.toString(),
+        _id: updatedOrder._id.toString(),
         id: updatedOrder.id,
         userId: updatedOrder.userId,
         items: updatedOrder.items as OrderItem[],
         total: updatedOrder.total,
-        status: updatedOrder.status,
+        status: updatedOrder.status as Order['status'],
         shippingAddress: updatedOrder.shippingAddress as ShippingAddress,
         createdAt: updatedOrder.createdAt,
         updatedAt: updatedOrder.updatedAt,
