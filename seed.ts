@@ -1,18 +1,17 @@
 import { connectToDatabase, getDatabaseModels, hashPassword } from './lib/mongodb';
-import { User, Product, Allocation, Order } from './types';
+import { User, Product, Order } from './types';
 
 async function seedDatabase() {
   try {
     console.log('🌱 Starting database seeding...');
 
     await connectToDatabase();
-    const { UserModel, ProductModel, AllocationModel, OrderModel } = getDatabaseModels();
+    const { UserModel, ProductModel, OrderModel } = getDatabaseModels();
 
     // Clear existing data
     console.log('🧹 Clearing existing data...');
     await UserModel.deleteMany({});
     await ProductModel.deleteMany({});
-    await AllocationModel.deleteMany({});
     await OrderModel.deleteMany({});
 
     // Seed demo users
@@ -28,32 +27,25 @@ async function seedDatabase() {
         role: 'ADMIN',
       },
       {
-        id: 'supervisor-001',
-        name: 'Supervisor User',
-        email: 'supervisor@emzor.com',
+        id: 'user-001',
+        name: 'Regular User',
+        email: 'user@emzor.com',
         password: hashedPassword,
-        role: 'SUPERVISOR',
+        role: 'USER',
       },
       {
-        id: 'student-001',
-        name: 'Student User',
-        email: 'student@emzor.com',
-        password: hashedPassword,
-        role: 'STUDENT',
-      },
-      {
-        id: 'student-002',
+        id: 'user-002',
         name: 'John Doe',
         email: 'john@emzor.com',
         password: hashedPassword,
-        role: 'STUDENT',
+        role: 'USER',
       },
       {
-        id: 'student-003',
+        id: 'user-003',
         name: 'Jane Smith',
         email: 'jane@emzor.com',
         password: hashedPassword,
-        role: 'STUDENT',
+        role: 'USER',
       },
     ];
 
@@ -122,60 +114,12 @@ async function seedDatabase() {
     await ProductModel.insertMany(demoProducts);
     console.log(`✅ Created ${demoProducts.length} demo products`);
 
-    // Seed demo allocations
-    console.log('📋 Creating demo allocations...');
-    const demoAllocations: Allocation[] = [
-      {
-        id: 'alloc-001',
-        title: 'Inventory Management Training',
-        description: 'Complete training on proper inventory management procedures',
-        assignedTo: 'student-001',
-        assignedBy: 'supervisor-001',
-        status: 'IN_PROGRESS',
-        priority: 'HIGH',
-        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-      },
-      {
-        id: 'alloc-002',
-        title: 'Customer Service Excellence',
-        description: 'Learn and implement best practices for customer service',
-        assignedTo: 'student-002',
-        assignedBy: 'supervisor-001',
-        status: 'PENDING',
-        priority: 'MEDIUM',
-        dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from now
-      },
-      {
-        id: 'alloc-003',
-        title: 'Quality Control Procedures',
-        description: 'Master quality control procedures for pharmaceutical products',
-        assignedTo: 'student-003',
-        assignedBy: 'supervisor-001',
-        status: 'COMPLETED',
-        priority: 'HIGH',
-        dueDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
-      },
-      {
-        id: 'alloc-004',
-        title: 'Documentation Standards',
-        description: 'Learn proper documentation standards for pharmaceutical operations',
-        assignedTo: 'student-001',
-        assignedBy: 'supervisor-001',
-        status: 'PENDING',
-        priority: 'LOW',
-        dueDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // 10 days from now
-      },
-    ];
-
-    await AllocationModel.insertMany(demoAllocations);
-    console.log(`✅ Created ${demoAllocations.length} demo allocations`);
-
     // Seed demo orders
     console.log('🛒 Creating demo orders...');
     const demoOrders: Order[] = [
       {
         id: 'order-001',
-        userId: 'student-001',
+        userId: 'user-001',
         items: [
           {
             product: demoProducts[0], // Paracetamol
@@ -191,7 +135,7 @@ async function seedDatabase() {
         total: 8200,
         status: 'DELIVERED',
         shippingAddress: {
-          fullName: 'Student User',
+          fullName: 'Regular User',
           phone: '+2341234567890',
           address: '123 Main Street',
           city: 'Lagos',
@@ -203,7 +147,7 @@ async function seedDatabase() {
       },
       {
         id: 'order-002',
-        userId: 'student-002',
+        userId: 'user-002',
         items: [
           {
             product: demoProducts[3], // Ibuprofen
@@ -226,7 +170,7 @@ async function seedDatabase() {
       },
       {
         id: 'order-003',
-        userId: 'student-003',
+        userId: 'user-003',
         items: [
           {
             product: demoProducts[1], // Amoxicillin
@@ -261,13 +205,11 @@ async function seedDatabase() {
     console.log('\n📊 Summary:');
     console.log(`   • Users: ${demoUsers.length}`);
     console.log(`   • Products: ${demoProducts.length}`);
-    console.log(`   • Allocations: ${demoAllocations.length}`);
     console.log(`   • Orders: ${demoOrders.length}`);
 
     console.log('\n🔑 Demo Credentials:');
     console.log('   • Admin: admin@emzor.com / password');
-    console.log('   • Supervisor: supervisor@emzor.com / password');
-    console.log('   • Student: student@emzor.com / password');
+    console.log('   • User: user@emzor.com / password');
 
     process.exit(0);
   } catch (error) {

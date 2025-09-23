@@ -5,7 +5,7 @@ A complete pharmaceutical distribution management system with role-based dashboa
 ## Features
 
 ### 🔐 Authentication & Authorization
-- **Multi-Role Authentication**: Admin, Supervisor, and Student roles
+- **Two-Role Authentication**: Admin and User roles
 - **Secure Login/Registration**: JWT-based authentication with bcrypt password hashing
 - **Role-Based Access Control**: Conditional rendering based on user roles
 - **Persistent Sessions**: Automatic login state management
@@ -15,19 +15,12 @@ A complete pharmaceutical distribution management system with role-based dashboa
 - **Product Management**: Full CRUD operations on products with live inventory tracking
 - **Order Management**: View and manage all customer orders
 - **System Statistics**: Real-time dashboard with MongoDB data
-- **Allocation Management**: Oversee task allocations and assignments
 
-### 👨‍🏫 Supervisor Dashboard
-- **Task Allocation**: Create and assign tasks to students
-- **Progress Tracking**: Monitor student progress on assigned tasks
-- **Student Management**: View and manage assigned students
-- **Performance Analytics**: Track completion rates and overdue tasks
-
-### 🎓 Student Dashboard
-- **Task Management**: View assigned tasks and update progress
-- **Personal Dashboard**: Track personal performance and deadlines
-- **Progress Updates**: Update task status and completion
-- **Due Date Tracking**: Monitor upcoming and overdue assignments
+### 👤 User Dashboard
+- **Product Catalog**: Browse and search pharmaceutical products
+- **Shopping Cart**: Add products and manage cart items
+- **Order History**: View personal orders and track status
+- **Account Management**: Update profile and manage preferences
 
 ### 🛍️ E-Commerce Features
 - **Product Catalog**: Browse pharmaceutical products with categories
@@ -116,23 +109,17 @@ To create the first admin user, you can register through the application:
 - **Access**: Full system access
 - **Dashboard**: `/admin/dashboard`
 - **Features**: User management, product management, order management, system statistics
-- **Permissions**: Create/edit/delete users, products, orders, allocations
+- **Permissions**: Create/edit/delete users, products, orders
 
-### 👨‍🏫 Supervisor
-- **Access**: Task allocation and student management
-- **Dashboard**: `/supervisor/dashboard`
-- **Features**: Create allocations, monitor student progress, generate reports
-- **Permissions**: Create/manage task allocations, view assigned students
-
-### 🎓 Student
-- **Access**: Personal task management
-- **Dashboard**: `/student/dashboard`
-- **Features**: View assigned tasks, update progress, track deadlines
-- **Permissions**: Update task status, view personal assignments
+### 👤 User
+- **Access**: Product browsing and purchasing
+- **Dashboard**: `/account`
+- **Features**: Product catalog, shopping cart, order history, account management
+- **Permissions**: Browse products, place orders, manage personal account
 
 ## Authentication Flow
 
-1. **Registration**: Users can register with any role (Admin/Supervisor/Student)
+1. **Registration**: Users can register with Admin or User roles
 2. **Login**: Unified login page with role-based redirection
 3. **Dashboard Access**: Automatic redirection to appropriate dashboard based on role
 4. **Session Management**: JWT tokens stored in localStorage with automatic refresh
@@ -146,15 +133,10 @@ Use these credentials to test the application:
 - **Password**: `password`
 - **Access**: Admin dashboard with full system access
 
-### Supervisor
-- **Email**: `supervisor@emzor.com`
+### Regular User
+- **Email**: `user@emzor.com`
 - **Password**: `password`
-- **Access**: Supervisor dashboard for task allocation
-
-### Student
-- **Email**: `student@emzor.com`
-- **Password**: `password`
-- **Access**: Student dashboard for task management
+- **Access**: Product catalog and shopping features
 
 ## Project Structure
 
@@ -173,8 +155,7 @@ emzor-distribution/
 │   ├── useAuth.ts        # Authentication hook
 │   ├── useUsers.ts       # User management hook
 │   ├── useProducts.ts    # Product management hook
-│   ├── useOrders.ts      # Order management hook
-│   └── useAllocations.ts # Task allocation hook
+│   └── useOrders.ts      # Order management hook
 ├── lib/                  # Utility libraries
 │   └── mongodb.ts        # Database connection and models
 └── types/               # TypeScript type definitions
@@ -187,7 +168,6 @@ The application uses MongoDB as the backend database with the following models:
 - **Users**: Authentication and role management
 - **Products**: Pharmaceutical product catalog
 - **Orders**: Customer order management
-- **Allocations**: Task assignment system
 
 All data operations are handled through custom React hooks that provide:
 - Real-time data fetching
@@ -217,13 +197,6 @@ All data operations are handled through custom React hooks that provide:
 - ✅ Interactive data tables
 - ✅ Statistics and analytics
 - ✅ Progress tracking
-
-### Task Allocation System
-- ✅ Create and assign tasks
-- ✅ Priority levels (Low/Medium/High)
-- ✅ Due date tracking
-- ✅ Status updates (Pending/In Progress/Completed)
-- ✅ Overdue task alerts
 
 ## Security Features
 

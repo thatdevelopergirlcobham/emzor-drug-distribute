@@ -1,9 +1,11 @@
 import mongoose from 'mongoose';
+import jwt  from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 
 // MongoDB connection utility
 export const connectToDatabase = async (): Promise<void> => {
   try {
-    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/emzor-distribution';
+    const mongoUri = process.env.MONGODB_URI || 'mongodb+srv://user_db_user:r279PhhU0dKXoOsI@fuzzy-based-expert-syst.2cx2z6f.mongodb.net/emzor-drugs?retryWrites=true&w=majority';
 
     if (mongoose.connections[0].readyState) {
       return;
@@ -26,7 +28,7 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String,
     required: true,
-    enum: ['ADMIN', 'SUPERVISOR', 'STUDENT']
+    enum: ['ADMIN', 'USER']
   },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
@@ -81,28 +83,7 @@ const orderSchema = new mongoose.Schema({
 });
 
 // Allocation Schema (for Supervisor role)
-const allocationSchema = new mongoose.Schema({
-  id: { type: String, required: true, unique: true },
-  title: { type: String, required: true },
-  description: { type: String, required: true },
-  assignedTo: { type: String, required: true }, // User ID
-  assignedBy: { type: String, required: true }, // Supervisor ID
-  status: {
-    type: String,
-    required: true,
-    enum: ['PENDING', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'],
-    default: 'PENDING'
-  },
-  priority: {
-    type: String,
-    required: true,
-    enum: ['LOW', 'MEDIUM', 'HIGH'],
-    default: 'MEDIUM'
-  },
-  dueDate: Date,
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
-});
+
 
 // Get models function - ensures connection is established before returning models
 const getModels = () => {
@@ -115,7 +96,7 @@ const getModels = () => {
     UserModel: mongoose.models.User || mongoose.model('User', userSchema),
     ProductModel: mongoose.models.Product || mongoose.model('Product', productSchema),
     OrderModel: mongoose.models.Order || mongoose.model('Order', orderSchema),
-    AllocationModel: mongoose.models.Allocation || mongoose.model('Allocation', allocationSchema),
+   
   };
 };
 
@@ -126,10 +107,6 @@ export const getDatabaseModels = getModels;
 export const UserModel = mongoose.models.User || mongoose.model('User', userSchema);
 export const ProductModel = mongoose.models.Product || mongoose.model('Product', productSchema);
 export const OrderModel = mongoose.models.Order || mongoose.model('Order', orderSchema);
-export const AllocationModel = mongoose.models.Allocation || mongoose.model('Allocation', allocationSchema);
-
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
 
 export const hashPassword = async (password: string): Promise<string> => {
   const salt = await bcrypt.genSalt(12);
@@ -142,7 +119,8 @@ export const comparePassword = async (password: string, hashedPassword: string):
 
 export const generateToken = (userId: string, role: string): string => {
   const secret = process.env.JWT_SECRET || 'fallback-secret';
-  return jwt.sign({ userId, role }, secret, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
+  
+  return jwt.sign({ userId, role }, secret);
 };
 
 export const verifyToken = (token: string): { userId: string; role: string } | null => {

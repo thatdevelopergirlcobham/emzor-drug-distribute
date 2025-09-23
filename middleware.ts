@@ -6,8 +6,6 @@ export function middleware(request: NextRequest) {
   // Define protected routes
   const protectedRoutes = [
     '/admin',
-    '/supervisor',
-    '/student',
     '/account',
     '/cart',
     '/checkout',

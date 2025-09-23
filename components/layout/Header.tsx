@@ -2,13 +2,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { ShoppingCart, Search, Menu, LogOut } from 'lucide-react';
 import { useUser } from '@/context/UserContext';
 
 export default function Header() {
   const router = useRouter();
-  const pathname = usePathname();
   const { state: userState, logout: userLogout } = useUser();
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -66,15 +65,7 @@ export default function Header() {
             <Link href="/products" className="text-gray-700 hover:text-primary transition-colors">
               Products
             </Link>
-            <Link href="/#categories" className="text-gray-700 hover:text-primary transition-colors">
-              Categories
-            </Link>
-            <Link href="/#about" className="text-gray-700 hover:text-primary transition-colors">
-              About
-            </Link>
-            <Link href="/#contact" className="text-gray-700 hover:text-primary transition-colors">
-              Contact
-            </Link>
+            
           </nav>
 
           {/* Right side actions */}
@@ -139,7 +130,7 @@ export default function Header() {
             ) : userState.isAuthenticated ? (
               <div className="flex items-center space-x-4">
                 <Link
-                  href="/account"
+                  href="/"
                   className="text-gray-600 hover:text-primary transition-colors font-medium"
                 >
                   My Account

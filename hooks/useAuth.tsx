@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }));
         return false;
       }
-    } catch (error) {
+    } catch {
       setState(prev => ({
         ...prev,
         loading: false,
@@ -116,7 +116,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }));
         return false;
       }
-    } catch (error) {
+    } catch {
       setState(prev => ({
         ...prev,
         loading: false,
@@ -131,8 +131,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await fetch('/api/auth/logout', {
         method: 'POST',
       });
-    } catch (error) {
-      console.error('Logout error:', error);
+    } catch (_error) {
+      console.error('Logout error:', _error);
     } finally {
       setState(prev => ({
         ...prev,
@@ -156,7 +156,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           ...prev,
           user,
         }));
-      } catch (error) {
+      } catch {
         localStorage.removeItem('user');
       }
     }
