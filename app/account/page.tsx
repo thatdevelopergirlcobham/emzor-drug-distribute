@@ -158,7 +158,7 @@ export default function AccountPage() {
                             <div>
                               <h4 className="font-semibold text-gray-900">Order #{order.id.slice(-8)}</h4>
                               <p className="text-sm text-gray-600">
-                                {new Date(order.createdAt).toLocaleDateString()}
+                                {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'Date not available'}
                               </p>
                             </div>
                             <div className="text-right">

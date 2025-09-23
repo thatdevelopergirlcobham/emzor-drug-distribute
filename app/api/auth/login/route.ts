@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase, getDatabaseModels, comparePassword, generateToken } from '@/lib/mongodb';
 
@@ -17,7 +19,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Find user
-    const user = await UserModel.findOne({ email }).lean();
+    const user = await UserModel.findOne({ email }).lean() as any & { password: string; };
 
     if (!user) {
       return NextResponse.json(
