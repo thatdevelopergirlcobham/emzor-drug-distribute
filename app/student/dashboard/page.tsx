@@ -15,9 +15,9 @@ interface StudentAllocationStats {
 }
 
 export default function StudentDashboard() {
-  const { state: allocationsState } = useAllocations();
+  const { allocations } = useAllocations();
   const { user } = useAuth();
-  const { state: usersState } = useUsers();
+  const { users } = useUsers();
 
   const [stats, setStats] = useState<StudentAllocationStats>({
     total: 0,
@@ -28,8 +28,8 @@ export default function StudentDashboard() {
   });
 
   useEffect(() => {
-    if (allocationsState.allocations.length > 0 && user) {
-      const userAllocations = allocationsState.allocations.filter(a => a.assignedTo === user.id);
+    if (allocations.length > 0 && user) {
+      const userAllocations = allocations.filter(a => a.assignedTo === user.id);
       const now = new Date();
 
       const total = userAllocations.length;
@@ -42,9 +42,9 @@ export default function StudentDashboard() {
 
       setStats({ total, pending, inProgress, completed, overdue });
     }
-  }, [allocationsState.allocations, user]);
+  }, [allocations, user]);
 
-  const userAllocations = user ? allocationsState.allocations.filter(a => a.assignedTo === user.id) : [];
+  const userAllocations = user ? allocations.filter(a => a.assignedTo === user.id) : [];
 
   const statCards = [
     {
@@ -138,7 +138,7 @@ export default function StudentDashboard() {
             ) : (
               <div className="space-y-4">
                 {userAllocations.slice(0, 5).map((allocation) => {
-                  const supervisor = usersState.users.find(u => u.id === allocation.assignedBy);
+                  const supervisor = users.find(u => u.id === allocation.assignedBy);
                   return (
                     <div key={allocation.id} className="border border-gray-200 rounded-lg p-4">
                       <div className="flex items-center justify-between">
