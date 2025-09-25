@@ -57,7 +57,7 @@ const initializeDummyData = () => {
         category: 'Analgesics',
         price: 150,
         description: 'Effective pain relief and fever reducer',
-        imageUrl: '/images/paracetamol.jpg',
+        imageUrl: '/images/paractamol.jpg',
         stock: 100,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -68,7 +68,7 @@ const initializeDummyData = () => {
         category: 'Antibiotics',
         price: 200,
         description: 'Broad-spectrum antibiotic for bacterial infections',
-        imageUrl: '/images/amoxicillin.jpg',
+        imageUrl: '/images/amoxil.webp',
         stock: 50,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -79,7 +79,7 @@ const initializeDummyData = () => {
         category: 'Vitamins',
         price: 300,
         description: 'Immune system booster with antioxidant properties',
-        imageUrl: '/images/vitamin-c.jpg',
+        imageUrl: '/images/vitamin.jpg',
         stock: 200,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -101,7 +101,7 @@ const initializeDummyData = () => {
         category: 'Vitamins',
         price: 450,
         description: 'Complete daily vitamin and mineral supplement',
-        imageUrl: '/images/multivitamin.jpg',
+        imageUrl: '/images/multivitamins.jpg',
         stock: 150,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -112,7 +112,7 @@ const initializeDummyData = () => {
         category: 'Digestive',
         price: 120,
         description: 'Fast relief from heartburn and indigestion',
-        imageUrl: '/images/antacid.jpg',
+        imageUrl: '/images/digestive.jpg',
         stock: 80,
         createdAt: new Date(),
         updatedAt: new Date()
