@@ -1,121 +1,80 @@
-import { connectToDatabase, UserModel, ProductModel, hashPassword } from '@/lib/mongodb';
+import { UserModel, ProductModel, hashPassword, clearAllData } from '@/lib/mongodb';
 import { User, Product } from '@/types';
 
 const seedData = async () => {
   try {
-    await connectToDatabase();
-    console.log('Connected to MongoDB');
+    // Clear existing data and reinitialize with fresh data
+    clearAllData();
+    console.log('Cleared existing data and initialized with fresh dummy data');
 
-    // Check if data already exists
+    // Check if data already exists (this will always be true after clearAllData)
     const existingUsers = await UserModel.countDocuments();
     const existingProducts = await ProductModel.countDocuments();
 
-    if (existingUsers > 0) {
-      console.log('Users already exist, skipping seed');
-    } else {
-      // Create initial admin user
-      const adminPassword = await hashPassword('password');
-      const adminUser: Partial<User> = {
-        id: 'admin-001',
-        name: 'System Administrator',
-        email: 'admin@emzor.com',
-        password: adminPassword,
-        role: 'ADMIN',
-      };
-      await UserModel.create(adminUser);
-      console.log('Admin user created');
+    console.log(`Found ${existingUsers} users and ${existingProducts} products after initialization`);
 
-      // Create initial supervisor user
-      const supervisorPassword = await hashPassword('password');
-      const supervisorUser: Partial<User> = {
-        id: 'supervisor-001',
-        name: 'John Supervisor',
-        email: 'supervisor@emzor.com',
-        password: supervisorPassword,
-        role: 'SUPERVISOR',
+    // Add additional users if needed
+    if (existingUsers < 4) { // We start with 3 users (admin, supervisor, student)
+      // Create additional test users
+      const testUserPassword = await hashPassword('password');
+      const testUser: Partial<User> = {
+        id: 'test-user-001',
+        name: 'Test User',
+        email: 'test@example.com',
+        password: testUserPassword,
+        role: 'USER',
       };
-      await UserModel.create(supervisorUser);
-      console.log('Supervisor user created');
-
-      // Create initial student user
-      const studentPassword = await hashPassword('password');
-      const studentUser: Partial<User> = {
-        id: 'student-001',
-        name: 'Jane Student',
-        email: 'student@emzor.com',
-        password: studentPassword,
-        role: 'STUDENT',
-      };
-      await UserModel.create(studentUser);
-      console.log('Student user created');
+      await UserModel.create(testUser);
+      console.log('Test user created');
     }
 
-    if (existingProducts > 0) {
-      console.log('Products already exist, skipping seed');
-    } else {
-      // Create sample products
-      const products: Partial<Product>[] = [
+    // Add additional products if needed
+    if (existingProducts < 10) { // We start with 6 products
+      // Create additional sample products
+      const additionalProducts: Partial<Product>[] = [
         {
-          id: 'prod-001',
-          name: 'Paracetamol 500mg',
+          id: 'prod-007',
+          name: 'Aspirin 100mg',
           category: 'Analgesics',
-          price: 150,
-          description: 'Effective pain relief and fever reducer',
-          imageUrl: '/images/paracetamol.jpg',
-          stock: 100,
+          price: 80,
+          description: 'Common pain reliever and anti-inflammatory',
+          imageUrl: '/images/aspirin.jpg',
+          stock: 120,
         },
         {
-          id: 'prod-002',
-          name: 'Amoxicillin 250mg',
-          category: 'Antibiotics',
-          price: 200,
-          description: 'Broad-spectrum antibiotic for bacterial infections',
-          imageUrl: '/images/amoxicillin.jpg',
-          stock: 50,
+          id: 'prod-008',
+          name: 'Cetirizine 10mg',
+          category: 'Antihistamines',
+          price: 95,
+          description: 'Allergy relief medication',
+          imageUrl: '/images/cetirizine.jpg',
+          stock: 90,
         },
         {
-          id: 'prod-003',
-          name: 'Vitamin C 1000mg',
-          category: 'Vitamins',
-          price: 300,
-          description: 'Immune system booster with antioxidant properties',
-          imageUrl: '/images/vitamin-c.jpg',
-          stock: 200,
-        },
-        {
-          id: 'prod-004',
-          name: 'Ibuprofen 400mg',
-          category: 'Anti-inflammatory',
-          price: 180,
-          description: 'Reduces inflammation, pain, and fever',
-          imageUrl: '/images/ibuprofen.jpg',
-          stock: 75,
-        },
-        {
-          id: 'prod-005',
-          name: 'Multivitamin Complex',
-          category: 'Vitamins',
-          price: 450,
-          description: 'Complete daily vitamin and mineral supplement',
-          imageUrl: '/images/multivitamin.jpg',
-          stock: 150,
-        },
-        {
-          id: 'prod-006',
-          name: 'Antacid Tablets',
+          id: 'prod-009',
+          name: 'Omeprazole 20mg',
           category: 'Digestive',
-          price: 120,
-          description: 'Fast relief from heartburn and indigestion',
-          imageUrl: '/images/antacid.jpg',
-          stock: 80,
+          price: 250,
+          description: 'Proton pump inhibitor for acid reflux',
+          imageUrl: '/images/omeprazole.jpg',
+          stock: 60,
         },
+        {
+          id: 'prod-010',
+          name: 'Calcium Carbonate 500mg',
+          category: 'Supplements',
+          price: 110,
+          description: 'Calcium supplement for bone health',
+          imageUrl: '/images/calcium.jpg',
+          stock: 180,
+        }
       ];
 
-      await ProductModel.insertMany(products);
-      console.log('Sample products created');
+      await ProductModel.insertMany(additionalProducts);
+      console.log('Additional sample products created');
     }
 
-    console.log('Database seeded successfully');
+    console.log('Database seeded successfully with dummy data');
     process.exit(0);
   } catch (error) {
     console.error('Error seeding database:', error);

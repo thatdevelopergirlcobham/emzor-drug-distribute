@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import mongoose from 'mongoose';
 import { Product, ProductFormData } from '@/types';
 import { ProductModel } from '@/lib/mongodb';
 
@@ -9,20 +8,6 @@ interface ProductsState {
   products: Product[];
   loading: boolean;
   error: string | null;
-}
-
-// MongoDB document interface for Product
-interface MongoProductDocument {
-  _id: mongoose.Types.ObjectId;
-  id: string;
-  name: string;
-  category: string;
-  price: number;
-  description: string;
-  imageUrl: string;
-  stock?: number;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 export function useProducts() {
@@ -36,24 +21,11 @@ export function useProducts() {
     setState(prev => ({ ...prev, loading: true, error: null }));
 
     try {
-      const products = await ProductModel.find().sort({ createdAt: -1 }).lean() as unknown as MongoProductDocument[];
-
-      const formattedProducts: Product[] = products.map(product => ({
-        _id: product._id.toString(),
-        id: product.id,
-        name: product.name,
-        category: product.category,
-        price: product.price,
-        description: product.description,
-        imageUrl: product.imageUrl,
-        stock: product.stock,
-        createdAt: product.createdAt,
-        updatedAt: product.updatedAt,
-      }));
+      const products = await ProductModel.find();
 
       setState(prev => ({
         ...prev,
-        products: formattedProducts,
+        products,
         loading: false,
       }));
     } catch (error) {
@@ -70,27 +42,14 @@ export function useProducts() {
       const newProduct = await ProductModel.create({
         id: `prod-${Date.now()}`,
         ...productData,
-      }) as MongoProductDocument;
-
-      const formattedProduct: Product = {
-        _id: newProduct._id.toString(),
-        id: newProduct.id,
-        name: newProduct.name,
-        category: newProduct.category,
-        price: newProduct.price,
-        description: newProduct.description,
-        imageUrl: newProduct.imageUrl,
-        stock: newProduct.stock,
-        createdAt: newProduct.createdAt,
-        updatedAt: newProduct.updatedAt,
-      };
+      });
 
       setState(prev => ({
         ...prev,
-        products: [formattedProduct, ...prev.products],
+        products: [newProduct, ...prev.products],
       }));
 
-      return formattedProduct;
+      return newProduct;
     } catch (error) {
       setState(prev => ({
         ...prev,
@@ -106,33 +65,20 @@ export function useProducts() {
         { id },
         { ...productData, updatedAt: new Date() },
         { new: true }
-      ).lean() as unknown as MongoProductDocument | null;
+      );
 
       if (!updatedProduct) {
         throw new Error('Product not found');
       }
 
-      const formattedProduct: Product = {
-        _id: updatedProduct._id.toString(),
-        id: updatedProduct.id,
-        name: updatedProduct.name,
-        category: updatedProduct.category,
-        price: updatedProduct.price,
-        description: updatedProduct.description,
-        imageUrl: updatedProduct.imageUrl,
-        stock: updatedProduct.stock,
-        createdAt: updatedProduct.createdAt,
-        updatedAt: updatedProduct.updatedAt,
-      };
-
       setState(prev => ({
         ...prev,
         products: prev.products.map(product =>
-          product.id === id ? formattedProduct : product
+          product.id === id ? updatedProduct : product
         ),
       }));
 
-      return formattedProduct;
+      return updatedProduct;
     } catch (error) {
       setState(prev => ({
         ...prev,
@@ -144,7 +90,7 @@ export function useProducts() {
 
   const deleteProduct = useCallback(async (id: string): Promise<boolean> => {
     try {
-      const result = await ProductModel.findOneAndDelete({ id }) as unknown as MongoProductDocument | null;
+      const result = await ProductModel.findOneAndDelete({ id });
 
       if (!result) {
         throw new Error('Product not found');

@@ -136,25 +136,10 @@ export class UserModel {
   }
 
   static async find(query: any = {}): Promise<User[]> {
-    let result = users;
     if (query.role) {
-      result = users.filter(u => u.role === query.role);
+      return users.filter(u => u.role === query.role);
     }
-
-    // Handle select method for excluding fields
-    if (query.select) {
-      const excludeFields = query.select.startsWith('-') ? query.select.substring(1).split(' ') : [];
-      if (excludeFields.includes('password')) {
-        return result.map(user => ({ ...user, password: undefined })) as unknown as User[];
-      }
-    }
-
-    return result;
-  }
-
-  static async lean(): Promise<any> {
-    // For dummy data, lean() just returns the models themselves
-    return this;
+    return users;
   }
 
   static async countDocuments(): Promise<number> {
@@ -184,32 +169,6 @@ export class UserModel {
     return users[userIndex];
   }
 
-  static async findOneAndUpdate(query: any, updateData: any, options: any = {}): Promise<User | null> {
-    const user = users.find(u =>
-      (query.email && u.email === query.email) ||
-      (query.id && u.id === query.id)
-    );
-    if (!user) return null;
-
-    const updatedUser = { ...user, ...updateData, updatedAt: new Date() };
-    const userIndex = users.findIndex(u => u.id === user.id);
-    users[userIndex] = updatedUser;
-
-    return options.new ? updatedUser : user;
-  }
-
-  static async findOneAndDelete(query: any): Promise<User | null> {
-    const userIndex = users.findIndex(u =>
-      (query.email && u.email === query.email) ||
-      (query.id && u.id === query.id)
-    );
-    if (userIndex === -1) return null;
-
-    const deletedUser = users[userIndex];
-    users.splice(userIndex, 1);
-    return deletedUser;
-  }
-
   static async findByIdAndDelete(id: string): Promise<User | null> {
     const userIndex = users.findIndex(u => u.id === id);
     if (userIndex === -1) return null;
@@ -229,13 +188,8 @@ export class ProductModel {
     return products;
   }
 
-  static async findOne(query: any): Promise<Product | null> {
-    return products.find(p => p.id === query.id) || null;
-  }
-
-  static async lean(): Promise<any> {
-    // For dummy data, lean() just returns the models themselves
-    return this;
+  static async findById(id: string): Promise<Product | null> {
+    return products.find(p => p.id === id) || null;
   }
 
   static async countDocuments(): Promise<number> {
@@ -266,19 +220,8 @@ export class ProductModel {
     return products[productIndex];
   }
 
-  static async findOneAndUpdate(query: any, updateData: any, options: any = {}): Promise<Product | null> {
-    const product = products.find(p => p.id === query.id);
-    if (!product) return null;
-
-    const updatedProduct = { ...product, ...updateData, updatedAt: new Date() };
-    const productIndex = products.findIndex(p => p.id === query.id);
-    products[productIndex] = updatedProduct;
-
-    return options.new ? updatedProduct : product;
-  }
-
-  static async findOneAndDelete(query: any): Promise<Product | null> {
-    const productIndex = products.findIndex(p => p.id === query.id);
+  static async findByIdAndDelete(id: string): Promise<Product | null> {
+    const productIndex = products.findIndex(p => p.id === id);
     if (productIndex === -1) return null;
 
     const deletedProduct = products[productIndex];
@@ -341,26 +284,6 @@ export class OrderModel {
 
     orders[orderIndex] = { ...orders[orderIndex], ...updateData, updatedAt: new Date() };
     return orders[orderIndex];
-  }
-
-  static async findOneAndUpdate(query: any, updateData: any, options: any = {}): Promise<Order | null> {
-    const order = orders.find(o => o.id === query.id);
-    if (!order) return null;
-
-    const updatedOrder = { ...order, ...updateData, updatedAt: new Date() };
-    const orderIndex = orders.findIndex(o => o.id === order.id);
-    orders[orderIndex] = updatedOrder;
-
-    return options.new ? updatedOrder : order;
-  }
-
-  static async findOneAndDelete(query: any): Promise<Order | null> {
-    const orderIndex = orders.findIndex(o => o.id === query.id);
-    if (orderIndex === -1) return null;
-
-    const deletedOrder = orders[orderIndex];
-    orders.splice(orderIndex, 1);
-    return deletedOrder;
   }
 
   static async findByIdAndDelete(id: string): Promise<Order | null> {
