@@ -1,19 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connectToDatabase, getDatabaseModels, verifyToken } from '@/lib/mongodb';
+import { ProductModel, verifyToken } from '@/lib/dummydata';
 
 export async function GET() {
   try {
-    await connectToDatabase();
-    const { ProductModel } = getDatabaseModels();
-
-    // Get all products
-    const products = await ProductModel.find({}).lean();
-
+    // Get all products from dummy data
+    const products = await ProductModel.find();
     return NextResponse.json({
       success: true,
       data: products,
     }, { status: 200 });
-
   } catch (error) {
     console.error('Get products error:', error);
     return NextResponse.json(
@@ -25,9 +20,6 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    await connectToDatabase();
-    const { ProductModel } = getDatabaseModels();
-
     // Check authentication and admin role
     const token = request.cookies.get('auth-token')?.value;
 
@@ -57,14 +49,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create new product
+    // Create new product using dummy data model
     const newProduct = await ProductModel.create({
-      id: `prod-${Date.now()}`,
       name: productData.name,
       category: productData.category,
       price: productData.price,
-      description: productData.description,
-      imageUrl: productData.imageUrl,
+      description: productData.description || '',
+      imageUrl: productData.imageUrl || '/images/default-product.jpg',
       stock: productData.stock || 0,
     });
 

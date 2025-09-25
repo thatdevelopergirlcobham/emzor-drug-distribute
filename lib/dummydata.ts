@@ -127,7 +127,7 @@ initializeDummyData();
 
 // Dummy User Model
 export class UserModel {
-  static async findOne(query: any): Promise<User | null> {
+  static async findOne(query: { email?: string; id?: string }): Promise<User | null> {
     const user = users.find(u =>
       (query.email && u.email === query.email) ||
       (query.id && u.id === query.id)
@@ -135,7 +135,7 @@ export class UserModel {
     return user || null;
   }
 
-  static async find(query: any = {}): Promise<User[]> {
+  static async find(query: { role?: string } = {}): Promise<User[]> {
     if (query.role) {
       return users.filter(u => u.role === query.role);
     }
@@ -161,7 +161,7 @@ export class UserModel {
     return newUser;
   }
 
-  static async findByIdAndUpdate(id: string, updateData: any): Promise<User | null> {
+  static async findByIdAndUpdate(id: string, updateData: Partial<Omit<User, 'id' | 'createdAt' | 'updatedAt'>>): Promise<User | null> {
     const userIndex = users.findIndex(u => u.id === id);
     if (userIndex === -1) return null;
 
@@ -181,7 +181,7 @@ export class UserModel {
 
 // Dummy Product Model
 export class ProductModel {
-  static async find(query: any = {}): Promise<Product[]> {
+  static async find(query: { category?: string } = {}): Promise<Product[]> {
     if (query.category) {
       return products.filter(p => p.category === query.category);
     }
@@ -212,7 +212,7 @@ export class ProductModel {
     return newProduct;
   }
 
-  static async findByIdAndUpdate(id: string, updateData: any): Promise<Product | null> {
+  static async findByIdAndUpdate(id: string, updateData: Partial<Omit<Product, 'id' | 'createdAt' | 'updatedAt'>>): Promise<Product | null> {
     const productIndex = products.findIndex(p => p.id === id);
     if (productIndex === -1) return null;
 
@@ -248,7 +248,7 @@ export class ProductModel {
 
 // Dummy Order Model
 export class OrderModel {
-  static async find(query: any = {}): Promise<Order[]> {
+  static async find(query: { userId?: string } = {}): Promise<Order[]> {
     if (query.userId) {
       return orders.filter(o => o.userId === query.userId);
     }
@@ -278,7 +278,7 @@ export class OrderModel {
     return newOrder;
   }
 
-  static async findByIdAndUpdate(id: string, updateData: any): Promise<Order | null> {
+  static async findByIdAndUpdate(id: string, updateData: Partial<Omit<Order, 'id' | 'createdAt' | 'updatedAt' | 'items'>>): Promise<Order | null> {
     const orderIndex = orders.findIndex(o => o.id === id);
     if (orderIndex === -1) return null;
 

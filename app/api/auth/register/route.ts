@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connectToDatabase, getDatabaseModels, hashPassword, generateToken } from '@/lib/mongodb';
+import { UserModel, hashPassword, generateToken } from '@/lib/dummydata';
 
 export async function POST(request: NextRequest) {
   try {
-    await connectToDatabase();
-    const { UserModel } = getDatabaseModels();
-
     const { name, email, password, role } = await request.json();
 
     // Validate input
@@ -34,7 +31,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user already exists
-    const existingUser = await UserModel.findOne({ email }).lean();
+    const existingUser = await UserModel.findOne({ email });
 
     if (existingUser) {
       return NextResponse.json(
@@ -48,7 +45,6 @@ export async function POST(request: NextRequest) {
 
     // Create user
     const newUser = await UserModel.create({
-      id: `user-${Date.now()}`,
       name,
       email,
       password: hashedPassword,
@@ -58,16 +54,15 @@ export async function POST(request: NextRequest) {
     // Generate token
     const token = generateToken(newUser.id, newUser.role);
 
+    // Create user object without password
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: _, ...userWithoutPassword } = newUser;
+
     // Set HTTP-only cookie
     const response = NextResponse.json({
       success: true,
       message: 'Registration successful',
-      user: {
-        id: newUser.id,
-        name: newUser.name,
-        email: newUser.email,
-        role: newUser.role,
-      },
+      user: userWithoutPassword,
     }, { status: 201 });
 
     response.cookies.set('auth-token', token, {

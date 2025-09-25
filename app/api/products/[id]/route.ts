@@ -1,15 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connectToDatabase, getDatabaseModels, verifyToken } from '@/lib/mongodb';
+import { ProductModel, verifyToken } from '@/lib/dummydata';
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const { id } = params;
+    const product = await ProductModel.findById(id);
+
+    if (!product) {
+      return NextResponse.json(
+        { success: false, message: 'Product not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: product,
+    }, { status: 200 });
+
+  } catch (error) {
+    console.error('Get product error:', error);
+    return NextResponse.json(
+      { success: false, message: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    await connectToDatabase();
-    const { ProductModel } = getDatabaseModels();
-
-    // Check authentication and admin role
+    // Check authentication and role
     const token = request.cookies.get('auth-token')?.value;
 
     if (!token) {
@@ -31,19 +57,15 @@ export async function PUT(
     const productData = await request.json();
     const { id } = params;
 
-    // Find and update product
-    const updatedProduct = await ProductModel.findOneAndUpdate(
-      { id },
-      {
-        name: productData.name,
-        category: productData.category,
-        price: productData.price,
-        description: productData.description,
-        imageUrl: productData.imageUrl,
-        stock: productData.stock,
-      },
-      { new: true }
-    );
+    // Update product using dummy data model
+    const updatedProduct = await ProductModel.findByIdAndUpdate(id, {
+      name: productData.name,
+      category: productData.category,
+      price: productData.price,
+      description: productData.description,
+      imageUrl: productData.imageUrl,
+      stock: productData.stock,
+    });
 
     if (!updatedProduct) {
       return NextResponse.json(
@@ -72,10 +94,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    await connectToDatabase();
-    const { ProductModel } = getDatabaseModels();
-
-    // Check authentication and admin role
+    // Check authentication and role
     const token = request.cookies.get('auth-token')?.value;
 
     if (!token) {
@@ -96,8 +115,8 @@ export async function DELETE(
 
     const { id } = params;
 
-    // Find and delete product
-    const deletedProduct = await ProductModel.findOneAndDelete({ id });
+    // Delete product using dummy data model
+    const deletedProduct = await ProductModel.findByIdAndDelete(id);
 
     if (!deletedProduct) {
       return NextResponse.json(
@@ -109,6 +128,7 @@ export async function DELETE(
     return NextResponse.json({
       success: true,
       message: 'Product deleted successfully',
+      data: deletedProduct,
     }, { status: 200 });
 
   } catch (error) {

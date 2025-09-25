@@ -1,17 +1,12 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { NextRequest, NextResponse } from 'next/server';
-import { connectToDatabase, getDatabaseModels, comparePassword, generateToken } from '@/lib/mongodb';
+import { UserModel, comparePassword, generateToken } from '@/lib/dummydata';
 
 export async function POST(request: NextRequest) {
   try {
-    await connectToDatabase();
-    const { UserModel } = getDatabaseModels();
-
-    const { email, password } = await request.json();
+    const { email: userEmail, password: userPassword } = await request.json();
 
     // Validate input
-    if (!email || !password) {
+    if (!userEmail || !userPassword) {
       return NextResponse.json(
         { success: false, message: 'Email and password are required' },
         { status: 400 }
@@ -19,7 +14,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Find user
-    const user = await UserModel.findOne({ email }).lean() as any & { password: string; };
+    const user = await UserModel.findOne({ email: userEmail });
 
     if (!user) {
       return NextResponse.json(
@@ -29,7 +24,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check password
-    const isValidPassword = await comparePassword(password, user.password);
+    const isValidPassword = await comparePassword(userPassword, user.password);
 
     if (!isValidPassword) {
       return NextResponse.json(
@@ -38,8 +33,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Remove password from user object
-    const userWithoutPassword = user;
+    // Create user object without password
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...userWithoutPassword } = user;
 
     // Generate token
     const token = generateToken(user.id, user.role);
