@@ -3,7 +3,7 @@
 
 import { useState, useCallback } from 'react';
 import { DashboardStats, Order, OrderItem, ShippingAddress } from '@/types';
-import { UserModel, ProductModel, OrderModel } from '@/lib/mongodb';
+import { UserModel, ProductModel, OrderModel } from '@/lib/dummydata';
 
 interface DashboardState {
   stats: DashboardStats | null;

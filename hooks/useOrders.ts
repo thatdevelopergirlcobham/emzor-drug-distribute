@@ -3,7 +3,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Order, OrderItem, ShippingAddress } from '@/types';
-import { OrderModel } from '@/lib/mongodb';
+import { OrderModel } from '@/lib/dummydata';
 
 interface OrdersState {
   orders: Order[];

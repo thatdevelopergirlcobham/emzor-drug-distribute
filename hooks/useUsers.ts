@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { User } from '@/types';
-import { UserModel, hashPassword } from '@/lib/mongodb';
+import { UserModel, hashPassword } from '@/lib/dummydata';
 
 interface UsersState {
   users: User[];

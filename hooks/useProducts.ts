@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Product, ProductFormData } from '@/types';
-import { ProductModel } from '@/lib/mongodb';
+import { ProductModel } from '@/lib/dummydata';
 
 interface ProductsState {
   products: Product[];

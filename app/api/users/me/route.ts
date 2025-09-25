@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connectToDatabase, getDatabaseModels, verifyToken } from '@/lib/mongodb';
+import { connectToDatabase, getDatabaseModels, verifyToken } from '@/lib/dummydata';
+import { User } from '@/types';
 
 export async function GET(request: NextRequest) {
   try {
@@ -26,7 +27,12 @@ export async function GET(request: NextRequest) {
     }
 
     // Get user data
-    const user = await UserModel.findById(decoded.userId).select('-password').lean();
+    const user = await UserModel.findOne({ id: decoded.userId }).then((user: User | null) => {
+      if (user) {
+        return { ...user, password: undefined };
+      }
+      return null;
+    });
 
     if (!user) {
       return NextResponse.json(

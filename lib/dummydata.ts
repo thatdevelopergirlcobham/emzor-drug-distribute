@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User, Product, Order } from '@/types';
@@ -169,8 +170,25 @@ export class UserModel {
     return users[userIndex];
   }
 
-  static async findByIdAndDelete(id: string): Promise<User | null> {
-    const userIndex = users.findIndex(u => u.id === id);
+  static async findOneAndUpdate(query: any, updateData: any, options: any = {}): Promise<User | null> {
+    const user = users.find(u =>
+      (query.email && u.email === query.email) ||
+      (query.id && u.id === query.id)
+    );
+    if (!user) return null;
+
+    const updatedUser = { ...user, ...updateData, updatedAt: new Date() };
+    const userIndex = users.findIndex(u => u.id === user.id);
+    users[userIndex] = updatedUser;
+
+    return options.new ? updatedUser : user;
+  }
+
+  static async findOneAndDelete(query: any): Promise<User | null> {
+    const userIndex = users.findIndex(u =>
+      (query.email && u.email === query.email) ||
+      (query.id && u.id === query.id)
+    );
     if (userIndex === -1) return null;
 
     const deletedUser = users[userIndex];
@@ -220,8 +238,19 @@ export class ProductModel {
     return products[productIndex];
   }
 
-  static async findByIdAndDelete(id: string): Promise<Product | null> {
-    const productIndex = products.findIndex(p => p.id === id);
+  static async findOneAndUpdate(query: any, updateData: any, options: any = {}): Promise<Product | null> {
+    const product = products.find(p => p.id === query.id);
+    if (!product) return null;
+
+    const updatedProduct = { ...product, ...updateData, updatedAt: new Date() };
+    const productIndex = products.findIndex(p => p.id === query.id);
+    products[productIndex] = updatedProduct;
+
+    return options.new ? updatedProduct : product;
+  }
+
+  static async findOneAndDelete(query: any): Promise<Product | null> {
+    const productIndex = products.findIndex(p => p.id === query.id);
     if (productIndex === -1) return null;
 
     const deletedProduct = products[productIndex];
@@ -286,8 +315,19 @@ export class OrderModel {
     return orders[orderIndex];
   }
 
-  static async findByIdAndDelete(id: string): Promise<Order | null> {
-    const orderIndex = orders.findIndex(o => o.id === id);
+  static async findOneAndUpdate(query: any, updateData: any, options: any = {}): Promise<Order | null> {
+    const order = orders.find(o => o.id === query.id);
+    if (!order) return null;
+
+    const updatedOrder = { ...order, ...updateData, updatedAt: new Date() };
+    const orderIndex = orders.findIndex(o => o.id === order.id);
+    orders[orderIndex] = updatedOrder;
+
+    return options.new ? updatedOrder : order;
+  }
+
+  static async findOneAndDelete(query: any): Promise<Order | null> {
+    const orderIndex = orders.findIndex(o => o.id === query.id);
     if (orderIndex === -1) return null;
 
     const deletedOrder = orders[orderIndex];

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connectToDatabase, getDatabaseModels, verifyToken } from '@/lib/mongodb';
+import { connectToDatabase, getDatabaseModels, verifyToken } from '@/lib/dummydata';
 
 export async function GET(request: NextRequest) {
   try {
@@ -25,7 +25,9 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const users = await UserModel.find({}).select('-password').lean();
+    const users = await UserModel.find({}).then(users =>
+      users.map(user => ({ ...user, password: undefined }))
+    );
 
     return NextResponse.json({
       success: true,

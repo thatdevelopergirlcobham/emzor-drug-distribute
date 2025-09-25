@@ -1,4 +1,4 @@
-import { UserModel, ProductModel, hashPassword, clearAllData } from '@/lib/mongodb';
+import { UserModel, ProductModel, hashPassword, clearAllData } from '../lib/dummydata';
 import { User, Product } from '@/types';
 
 const seedData = async () => {

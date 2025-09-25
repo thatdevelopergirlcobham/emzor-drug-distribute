@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connectToDatabase, getDatabaseModels, verifyToken } from '@/lib/mongodb';
+import { connectToDatabase, getDatabaseModels, verifyToken } from '@/lib/dummydata';
 
 export async function GET(request: NextRequest) {
   try {
@@ -28,9 +28,9 @@ export async function GET(request: NextRequest) {
     // Get orders based on user role
     let orders;
     if (decoded.role === 'ADMIN') {
-      orders = await OrderModel.find({}).lean();
+      orders = await OrderModel.find({});
     } else {
-      orders = await OrderModel.find({ userId: decoded.userId }).lean();
+      orders = await OrderModel.find({ userId: decoded.userId });
     }
 
     return NextResponse.json({
