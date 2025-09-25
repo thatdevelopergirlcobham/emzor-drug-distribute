@@ -1,0 +1,68 @@
+[
+  {
+    "id": "prod-001",
+    "name": "Paracetamol 500mg",
+    "category": "Analgesics",
+    "price": 150,
+    "description": "Effective pain relief and fever reducer",
+    "imageUrl": "/images/paractamol.jpg",
+    "stock": 100,
+    "createdAt": "2023-10-27T10:00:00.000Z",
+    "updatedAt": "2023-10-27T10:00:00.000Z"
+  },
+  {
+    "id": "prod-002",
+    "name": "Amoxicillin 250mg",
+    "category": "Antibiotics",
+    "price": 2000,
+    "description": "Broad-spectrum antibiotic for bacterial infections",
+    "imageUrl": "/images/amoxil.webp",
+    "stock": 50,
+    "createdAt": "2023-10-27T10:00:00.000Z",
+    "updatedAt": "2023-10-27T10:00:00.000Z"
+  },
+  {
+    "id": "prod-003",
+    "name": "Vitamin C 1000mg",
+    "category": "Vitamins",
+    "price": 390,
+    "description": "Immune system booster with antioxidant properties",
+    "imageUrl": "/images/vitamin.jpg",
+    "stock": 200,
+    "createdAt": "2023-10-27T10:00:00.000Z",
+    "updatedAt": "2023-10-27T10:00:00.000Z"
+  },
+  {
+    "id": "prod-004",
+    "name": "Ibuprofen 400mg",
+    "category": "Anti-inflammatory",
+    "price": 1800,
+    "description": "Reduces inflammation, pain, and fever",
+    "imageUrl": "/images/ibuprofen.jpg",
+    "stock": 75,
+    "createdAt": "2023-10-27T10:00:00.000Z",
+    "updatedAt": "2023-10-27T10:00:00.000Z"
+  },
+  {
+    "id": "prod-005",
+    "name": "Multivitamin Complex",
+    "category": "Vitamins",
+    "price": 4500,
+    "description": "Complete daily vitamin and mineral supplement",
+    "imageUrl": "/images/multivitamins.jpg",
+    "stock": 150,
+    "createdAt": "2023-10-27T10:00:00.000Z",
+    "updatedAt": "2023-10-27T10:00:00.000Z"
+  },
+  {
+    "id": "prod-006",
+    "name": "Antacid Tablets",
+    "category": "Digestive",
+    "price": 1200,
+    "description": "Fast relief from heartburn and indigestion",
+    "imageUrl": "/images/digestive.jpg",
+    "stock": 80,
+    "createdAt": "2023-10-27T10:00:00.000Z",
+    "updatedAt": "2023-10-27T10:00:00.000Z"
+  }
+]

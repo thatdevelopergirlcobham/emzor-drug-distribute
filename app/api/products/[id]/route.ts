@@ -116,7 +116,7 @@ export async function DELETE(
     const { id } = params;
 
     // Delete product using dummy data model
-    const deletedProduct = await ProductModel.findByIdAndDelete(id);
+    const deletedProduct = await ProductModel.findByIdAndRemove(id);
 
     if (!deletedProduct) {
       return NextResponse.json(

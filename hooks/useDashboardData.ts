@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { DashboardStats, Order, OrderItem, ShippingAddress } from '@/types';
+import { DashboardStats } from '@/types';
 import { UserModel, ProductModel, OrderModel } from '@/lib/dummydata';
 
 interface DashboardState {

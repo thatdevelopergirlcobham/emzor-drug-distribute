@@ -1,7 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useAdmin } from '@/context/AdminContext';
+import ProductList from '@/components/admin/ProductList';
+import ProductForm from '@/components/admin/ProductForm';
+import { Product } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/shared/card';
 import { Button } from '@/components/shared/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/shared/tabs';
@@ -17,7 +20,31 @@ import {
 export default function AdminDashboard() {
   const { state, logout } = useAdmin();
   // const { data: dashboardData, loading, error } = useDashboardData();
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('products');
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  const handleAddProduct = () => {
+    setEditingProduct(null);
+    setIsFormOpen(true);
+  };
+
+  const handleEditProduct = (product: Product) => {
+    setEditingProduct(product);
+    setIsFormOpen(true);
+  };
+
+  const handleFormClose = () => {
+    setIsFormOpen(false);
+    setEditingProduct(null);
+  };
+
+  const handleFormSave = useCallback(() => {
+    // This is a bit of a hack to force a re-render of the ProductList
+    // A more robust solution would involve a shared state management solution
+    setActiveTab('');
+    setTimeout(() => setActiveTab('products'), 0);
+  }, []);
 
   // useEffect(() => {
   //   if (!state.isAuthenticated) {
@@ -203,14 +230,14 @@ export default function AdminDashboard() {
                     <CardTitle>Product Management</CardTitle>
                     <CardDescription>Manage product catalog and inventory</CardDescription>
                   </div>
-                  <Button>
+                  <Button onClick={handleAddProduct}>
                     <Plus className="h-4 w-4 mr-2" />
                     Add Product
                   </Button>
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-500 text-center py-8">Product management interface coming soon...</p>
+                <ProductList onEdit={handleEditProduct} />
               </CardContent>
             </Card>
           </TabsContent>
@@ -236,6 +263,13 @@ export default function AdminDashboard() {
           </TabsContent>
         </Tabs>
       </main>
+
+      <ProductForm
+        isOpen={isFormOpen}
+        onClose={handleFormClose}
+        onSave={handleFormSave}
+        product={editingProduct}
+      />
     </div>
   );
 }

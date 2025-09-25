@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { UserModel, comparePassword, generateToken } from '@/lib/dummydata';
+import { UserModel, generateToken } from '@/lib/dummydata';
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,8 +23,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check password
-    const isValidPassword = await comparePassword(userPassword, user.password);
+    // Check password (simple comparison for mock data)
+    const isValidPassword = userPassword === user.password;
 
     if (!isValidPassword) {
       return NextResponse.json(

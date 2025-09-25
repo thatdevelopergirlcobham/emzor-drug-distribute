@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import Header from '@/components/layout/Header';
@@ -17,8 +17,6 @@ export default function LoginPage() {
 
 function LoginPageInner() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirect') || '/';
 
   const { login, loading, error: authError } = useAuth();
   const [credentials, setCredentials] = useState({ email: '', password: '' });
@@ -33,7 +31,7 @@ function LoginPageInner() {
       const success = await login(credentials);
       if (success) {
         const user = JSON.parse(localStorage.getItem('user') || '{}');
-        router.push(user.role === 'ADMIN' ? '/admin/dashboard' : redirectTo);
+        router.push(user.role === 'ADMIN' ? '/admin/dashboard' : '/cart');
       }
     } catch {
       setLocalError('Login failed. Please try again.');
