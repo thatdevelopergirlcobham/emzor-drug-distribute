@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ShoppingCart, Search, Menu, LogOut } from 'lucide-react';
+import { ShoppingCart, Search, Menu, LogOut, X } from 'lucide-react';
 import { useUser } from '@/context/UserContext';
 import { User } from '@/types';
 
@@ -12,6 +12,7 @@ export default function Header() {
   const { state: userState, logout: userLogout } = useUser();
   const [searchTerm, setSearchTerm] = useState('');
   const [user, setUser] = useState<User | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     // Check localStorage for user data
@@ -26,6 +27,18 @@ export default function Header() {
         setUser(null);
       }
     }
+  }, []);
+
+  // Close mobile menu on resize to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) { // md breakpoint
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const cartItemCount = user ? userState.cart.reduce((total, item) => total + item.quantity, 0) : 0;
@@ -43,7 +56,16 @@ export default function Header() {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('user');
     }
+    setIsMobileMenuOpen(false); // Close mobile menu on logout
     router.push('/');
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
   };
 
   return (
@@ -52,11 +74,11 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2">
+            <Link href="/" className="flex items-center space-x-2" onClick={closeMobileMenu}>
               <div className="bg-primary text-primary-foreground px-3 py-1 rounded-lg font-bold text-xl">
                 EMZOR
               </div>
-              <span className="text-gray-600 font-medium">Pharmaceutical</span>
+              <span className="text-gray-600 font-medium hidden sm:block">Pharmaceutical</span>
             </Link>
           </div>
 
@@ -72,9 +94,9 @@ export default function Header() {
           </nav>
 
           {/* Right side actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 md:space-x-4">
             {/* Search Form */}
-            <form onSubmit={handleSearch} className="hidden sm:flex items-center">
+            <form onSubmit={handleSearch} className="hidden lg:flex items-center">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <input
@@ -82,7 +104,7 @@ export default function Header() {
                   placeholder="Search products..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent w-64"
+                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent w-48 xl:w-64"
                 />
               </div>
             </form>
@@ -90,7 +112,7 @@ export default function Header() {
             {/* Mobile Search Button */}
             <button
               onClick={() => router.push('/products')}
-              className="sm:hidden text-gray-600 hover:text-primary transition-colors"
+              className="lg:hidden text-gray-600 hover:text-primary transition-colors p-2"
             >
               <Search className="h-5 w-5" />
             </button>
@@ -107,99 +129,202 @@ export default function Header() {
               </Link>
             )}
 
-            {/* User/Admin Authentication */}
-            {user?.role === 'ADMIN' ? (
-              <div className="flex items-center space-x-4">
-                <span className="text-sm text-gray-600">Welcome, {user.name}</span>
-                <Link
-                  href="/admin/dashboard"
-                  className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors font-medium"
-                >
-                  Admin Dashboard
-                </Link>
-                <button
-                  onClick={handleUserLogout}
-                  className="text-gray-600 hover:text-red-600 transition-colors"
-                  title="Logout"
-                >
-                  <LogOut className="h-5 w-5" />
-                </button>
-              </div>
-            ) : user ? (
-              <div className="flex items-center space-x-4">
-                <span className="text-sm text-gray-600">Hi, {user.name}</span>
-                <Link
-                  href="/orders"
-                  className="text-gray-600 hover:text-primary transition-colors font-medium"
-                >
-                  My Orders
-                </Link>
-                <button
-                  onClick={handleUserLogout}
-                  className="text-gray-600 hover:text-red-600 transition-colors"
-                  title="Logout"
-                >
-                  <LogOut className="h-5 w-5" />
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center space-x-2">
-                <Link
-                  href="/login"
-                  className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
-                >
-                  Sign In
-                </Link>
-                <span className="text-gray-400">|</span>
-                <Link
-                  href="/register"
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                >
-                  Sign Up
-                </Link>
-              </div>
-            )}
+            {/* Desktop User/Admin Authentication */}
+            <div className="hidden md:flex items-center space-x-4">
+              {user?.role === 'ADMIN' ? (
+                <>
+                  <span className="text-sm text-gray-600 hidden lg:block">Welcome, {user.name}</span>
+                  <Link
+                    href="/admin/dashboard"
+                    className="bg-primary text-primary-foreground px-3 lg:px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors font-medium text-sm"
+                  >
+                    <span className="hidden lg:inline">Admin Dashboard</span>
+                    <span className="lg:hidden">Admin</span>
+                  </Link>
+                  <button
+                    onClick={handleUserLogout}
+                    className="text-gray-600 hover:text-red-600 transition-colors p-2"
+                    title="Logout"
+                  >
+                    <LogOut className="h-5 w-5" />
+                  </button>
+                </>
+              ) : user ? (
+                <>
+                  <span className="text-sm text-gray-600 hidden lg:block">Hi, {user.name}</span>
+                  <Link
+                    href="/orders"
+                    className="text-gray-600 hover:text-primary transition-colors font-medium text-sm"
+                  >
+                    <span className="hidden lg:inline">My Orders</span>
+                    <span className="lg:hidden">Orders</span>
+                  </Link>
+                  <button
+                    onClick={handleUserLogout}
+                    className="text-gray-600 hover:text-red-600 transition-colors p-2"
+                    title="Logout"
+                  >
+                    <LogOut className="h-5 w-5" />
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="text-gray-600 hover:text-blue-600 transition-colors font-medium text-sm"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="bg-blue-600 text-white px-3 lg:px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
+            </div>
 
             {/* Mobile menu button */}
-            <button className="md:hidden text-gray-600 hover:text-primary transition-colors">
-              <Menu className="h-5 w-5" />
+            <button 
+              onClick={toggleMobileMenu}
+              className="md:hidden text-gray-600 hover:text-primary transition-colors p-2"
+              aria-label="Toggle mobile menu"
+            >
+              {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Navigation Menu (hidden by default) */}
-      <div className="md:hidden border-t border-gray-200">
+      {/* Mobile Navigation Menu */}
+      <div className={`md:hidden border-t border-gray-200 transition-all duration-300 ease-in-out ${
+        isMobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
+      }`}>
         <div className="px-4 pt-2 pb-3 space-y-1">
-          <Link href="/" className="block px-3 py-2 text-gray-700 hover:text-primary transition-colors">
+          {/* Navigation Links */}
+          <Link 
+            href="/" 
+            className="block px-3 py-2 text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md transition-colors"
+            onClick={closeMobileMenu}
+          >
             Home
           </Link>
-          <Link href="/products" className="block px-3 py-2 text-gray-700 hover:text-primary transition-colors">
+          <Link 
+            href="/products" 
+            className="block px-3 py-2 text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md transition-colors"
+            onClick={closeMobileMenu}
+          >
             Products
-          </Link>
-          <Link href="/#categories" className="block px-3 py-2 text-gray-700 hover:text-primary transition-colors">
-            Categories
-          </Link>
-          <Link href="/#about" className="block px-3 py-2 text-gray-700 hover:text-primary transition-colors">
-            About
-          </Link>
-          <Link href="/#contact" className="block px-3 py-2 text-gray-700 hover:text-primary transition-colors">
-            Contact
           </Link>
 
           {/* Mobile Search */}
-          <form onSubmit={handleSearch} className="px-3 py-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-              />
-            </div>
-          </form>
+          <div className="px-3 py-2">
+            <form onSubmit={handleSearch}>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                />
+              </div>
+            </form>
+          </div>
+
+          {/* Mobile User Authentication */}
+          <div className="border-t border-gray-200 pt-2 mt-2">
+            {user?.role === 'ADMIN' ? (
+              <>
+                <div className="px-3 py-2 text-sm text-gray-600 font-medium">
+                  Welcome, {user.name}
+                </div>
+                <Link
+                  href="/admin/dashboard"
+                  className="block px-3 py-2 text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  Admin Dashboard
+                </Link>
+                {user && (
+                  <Link
+                    href="/cart"
+                    className="flex items-center px-3 py-2 text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md transition-colors"
+                    onClick={closeMobileMenu}
+                  >
+                    <ShoppingCart className="h-4 w-4 mr-2" />
+                    Cart
+                    {cartItemCount > 0 && (
+                      <span className="ml-2 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                        {cartItemCount}
+                      </span>
+                    )}
+                  </Link>
+                )}
+                <button
+                  onClick={handleUserLogout}
+                  className="flex items-center w-full px-3 py-2 text-gray-700 hover:text-red-600 hover:bg-gray-50 rounded-md transition-colors"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </button>
+              </>
+            ) : user ? (
+              <>
+                <div className="px-3 py-2 text-sm text-gray-600 font-medium">
+                  Hi, {user.name}
+                </div>
+                <Link
+                  href="/orders"
+                  className="block px-3 py-2 text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  My Orders
+                </Link>
+                {user && (
+                  <Link
+                    href="/cart"
+                    className="flex items-center px-3 py-2 text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md transition-colors"
+                    onClick={closeMobileMenu}
+                  >
+                    <ShoppingCart className="h-4 w-4 mr-2" />
+                    Cart
+                    {cartItemCount > 0 && (
+                      <span className="ml-2 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                        {cartItemCount}
+                      </span>
+                    )}
+                  </Link>
+                )}
+                <button
+                  onClick={handleUserLogout}
+                  className="flex items-center w-full px-3 py-2 text-gray-700 hover:text-red-600 hover:bg-gray-50 rounded-md transition-colors"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors font-medium"
+                  onClick={closeMobileMenu}
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/register"
+                  className="block mx-3 my-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium text-center"
+                  onClick={closeMobileMenu}
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </header>
