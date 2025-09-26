@@ -1,275 +1,164 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import { useAdmin } from '@/context/AdminContext';
-import ProductList from '@/components/admin/ProductList';
-import ProductForm from '@/components/admin/ProductForm';
-import { Product } from '@/types';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/shared/card';
-import { Button } from '@/components/shared/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/shared/tabs';
-import {
-  Users,
-  Package,
-  ShoppingCart,
-  Plus,
-  Settings,
-  LogOut
-} from 'lucide-react';
+import Link from 'next/link';
+import { Plus, Package, Users, ShoppingCart, DollarSign } from 'lucide-react';
+import ProductDataTable from '@/components/admin/ProductDataTable';
+import { useProducts } from '@/hooks/useProducts';
+import { useDashboardData } from '@/hooks/useDashboardData';
 
 export default function AdminDashboard() {
-  const { state, logout } = useAdmin();
-  // const { data: dashboardData, loading, error } = useDashboardData();
-  const [activeTab, setActiveTab] = useState('products');
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const { products } = useProducts();
+  const { stats } = useDashboardData();
 
-  const handleAddProduct = () => {
-    setEditingProduct(null);
-    setIsFormOpen(true);
+  const statsData = stats ? {
+    totalProducts: stats.totalProducts,
+    totalUsers: stats.totalUsers,
+    totalOrders: stats.totalOrders,
+    totalValue: products.reduce((sum, product) => sum + product.price, 0),
+    categories: new Set(products.map(product => product.category)).size,
+    lowStock: products.filter(product => (product.stock || 0) < 10).length,
+  } : {
+    totalProducts: 0,
+    totalUsers: 0,
+    totalOrders: 0,
+    totalValue: 0,
+    categories: 0,
+    lowStock: 0,
   };
 
-  const handleEditProduct = (product: Product) => {
-    setEditingProduct(product);
-    setIsFormOpen(true);
-  };
-
-  const handleFormClose = () => {
-    setIsFormOpen(false);
-    setEditingProduct(null);
-  };
-
-  const handleFormSave = useCallback(() => {
-    // This is a bit of a hack to force a re-render of the ProductList
-    // A more robust solution would involve a shared state management solution
-    setActiveTab('');
-    setTimeout(() => setActiveTab('products'), 0);
-  }, []);
-
-  // useEffect(() => {
-  //   if (!state.isAuthenticated) {
-  //     window.location.href = '/admin/login';
-  //   }
-  // }, [state.isAuthenticated]);
-
-  // if (loading) {
-  //   return (
-  //     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-  //       <div className="text-center">
-  //         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-  //         <p className="text-gray-600">Loading dashboard...</p>
-  //       </div>
-  //     </div>
-  //   );
-  // }
-
-  // if (error) {
-  //   return (
-  //     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-  //       <div className="text-center">
-  //         <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-  //         <p className="text-gray-600">Error loading dashboard: {error}</p>
-  //       </div>
-  //     </div>
-  //   );
-  // }
-
-  const stats = [
-    {
-      title: 'Total Users',
-      value: 0, // dashboardData?.totalUsers || 0,
-      icon: Users,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-100',
-    },
+  const statCards = [
     {
       title: 'Total Products',
-      value: 0, // dashboardData?.totalProducts || 0,
+      value: statsData.totalProducts,
       icon: Package,
-      color: 'text-green-600',
-      bgColor: 'bg-green-100',
+      color: 'bg-blue-500',
+      description: 'Products in inventory',
+    },
+    {
+      title: 'Total Users',
+      value: statsData.totalUsers,
+      icon: Users,
+      color: 'bg-green-500',
+      description: 'Registered users',
     },
     {
       title: 'Total Orders',
-      value: 0, // dashboardData?.totalOrders || 0,
+      value: statsData.totalOrders,
       icon: ShoppingCart,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-100',
+      color: 'bg-purple-500',
+      description: 'Orders placed',
+    },
+    {
+      title: 'Inventory Value',
+      value: `₦${statsData.totalValue.toLocaleString()}`,
+      icon: DollarSign,
+      color: 'bg-orange-500',
+      description: 'Total inventory value',
     },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="space-y-8">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                Welcome back, {state.currentUser?.name}
-              </h1>
-              <p className="text-gray-600">Administrator Dashboard</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-600 mt-2">Manage your products and monitor your inventory</p>
+        </div>
+        <Link
+          href="/admin/products/new"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 transition-colors px-6 py-3 rounded-lg font-semibold flex items-center space-x-2"
+        >
+          <Plus className="h-5 w-5" />
+          <span>Add New Product</span>
+        </Link>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {statCards.map((stat) => (
+          <div key={stat.title} className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm">{stat.title}</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
+                <p className="text-gray-500 text-sm mt-1">{stat.description}</p>
+              </div>
+              <div className={`${stat.color} text-white p-3 rounded-lg`}>
+                <stat.icon className="h-6 w-6" />
+              </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <Button variant="outline" size="sm">
-                <Settings className="h-4 w-4 mr-2" />
-                Settings
-              </Button>
-              <Button variant="outline" size="sm" onClick={logout}>
-                <LogOut className="h-4 w-4 mr-2" />
-                Logout
-              </Button>
+          </div>
+        ))}
+      </div>
+
+      {/* Products Management */}
+      <div className="bg-white rounded-lg shadow-sm">
+        <div className="p-6 border-b border-gray-200">
+          <h2 className="text-xl font-bold text-gray-900">Product Management</h2>
+          <p className="text-gray-600 mt-1">View, edit, and manage your product inventory</p>
+        </div>
+        <div className="p-6">
+          <ProductDataTable />
+        </div>
+      </div>
+
+      {/* Recent Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+          <div className="space-y-3">
+            <Link
+              href="/admin/products/new"
+              className="block p-3 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-colors rounded-lg font-medium"
+            >
+              Add New Product
+            </Link>
+            <Link
+              href="/admin/products"
+              className="block p-3 bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors rounded-lg font-medium"
+            >
+              Manage Products
+            </Link>
+            <Link
+              href="/admin/users"
+              className="block p-3 bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors rounded-lg font-medium"
+            >
+              Manage Users
+            </Link>
+            <Link
+              href="/admin/orders"
+              className="block p-3 bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors rounded-lg font-medium"
+            >
+              View Orders
+            </Link>
+            <Link
+              href="/admin/allocations"
+              className="block p-3 bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors rounded-lg font-medium"
+            >
+              Manage Allocations
+            </Link>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">System Status</h3>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+              <span className="text-green-800 font-medium">MongoDB</span>
+              <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">Connected</span>
+            </div>
+            <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+              <span className="text-green-800 font-medium">API Status</span>
+              <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">Operational</span>
+            </div>
+            <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+              <span className="text-blue-800 font-medium">Total Categories</span>
+              <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">{statsData.categories}</span>
             </div>
           </div>
         </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {stats.map((stat, index) => (
-            <Card key={index}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">
-                  {stat.title}
-                </CardTitle>
-                <div className={`p-2 rounded-full ${stat.bgColor}`}>
-                  <stat.icon className={`h-4 w-4 ${stat.color}`} />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Main Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="users">Users</TabsTrigger>
-            <TabsTrigger value="products">Products</TabsTrigger>
-            <TabsTrigger value="orders">Orders</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="overview" className="space-y-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Recent Orders */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Recent Orders</CardTitle>
-                  <CardDescription>Latest customer orders</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-500 text-center py-4">No recent orders</p>
-                </CardContent>
-              </Card>
-
-              {/* System Status */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>System Status</CardTitle>
-                  <CardDescription>Current system health and metrics</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                      <div>
-                        <p className="font-medium text-gray-900">Database</p>
-                        <p className="text-sm text-gray-600">Connected and healthy</p>
-                      </div>
-                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                      <div>
-                        <p className="font-medium text-gray-900">API Status</p>
-                        <p className="text-sm text-gray-600">All endpoints operational</p>
-                      </div>
-                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                      <div>
-                        <p className="font-medium text-gray-900">Authentication</p>
-                        <p className="text-sm text-gray-600">JWT tokens active</p>
-                      </div>
-                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="users" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <div>
-                    <CardTitle>User Management</CardTitle>
-                    <CardDescription>Manage user accounts and permissions</CardDescription>
-                  </div>
-                  <Button>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add User
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-500 text-center py-8">User management interface coming soon...</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="products" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <div>
-                    <CardTitle>Product Management</CardTitle>
-                    <CardDescription>Manage product catalog and inventory</CardDescription>
-                  </div>
-                  <Button onClick={handleAddProduct}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Product
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <ProductList onEdit={handleEditProduct} />
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="orders" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <div>
-                    <CardTitle>Order Management</CardTitle>
-                    <CardDescription>Manage customer orders and fulfillment</CardDescription>
-                  </div>
-                  <Button>
-                    <Plus className="h-4 w-4 mr-2" />
-                    New Order
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-500 text-center py-8">Order management interface coming soon...</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </main>
-
-      <ProductForm
-        isOpen={isFormOpen}
-        onClose={handleFormClose}
-        onSave={handleFormSave}
-        product={editingProduct}
-      />
+      </div>
     </div>
   );
 }

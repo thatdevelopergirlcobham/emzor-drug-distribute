@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { useAdmin } from '@/context/AdminContext';
+import { useProducts } from '@/hooks/useProducts';
 import { Product, ProductFormData } from '@/types';
 
 interface ProductModalProps {
@@ -12,7 +12,7 @@ interface ProductModalProps {
 }
 
 export default function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
-  const { addProduct, updateProduct } = useAdmin();
+  const { createProduct, updateProduct, fetchProducts } = useProducts();
   const [formData, setFormData] = useState<ProductFormData>({
     name: '',
     category: '',
@@ -83,9 +83,11 @@ export default function ProductModal({ isOpen, onClose, product }: ProductModalP
         await updateProduct(product.id, formData);
       } else {
         // Add new product
-        await addProduct(formData);
+        await createProduct(formData);
       }
 
+      // Refresh the product list
+      await fetchProducts();
       onClose();
     } catch (error) {
       console.error('Error saving product:', error);

@@ -148,16 +148,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Check for existing session on mount
   React.useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try {
-        const user: AuthUser = JSON.parse(storedUser);
-        setState(prev => ({
-          ...prev,
-          user,
-        }));
-      } catch {
-        localStorage.removeItem('user');
+    // Ensure this runs only on the client
+    if (typeof window !== 'undefined') {
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        try {
+          const user: AuthUser = JSON.parse(storedUser);
+          setState(prev => ({
+            ...prev,
+            user,
+          }));
+        } catch {
+          localStorage.removeItem('user');
+        }
       }
     }
   }, []);

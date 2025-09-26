@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
+import { User } from '@/types';
 
 export default function AdminLayout({
   children,
@@ -11,16 +11,29 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const { user, loading, logout } = useAuth();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!loading && !user) {
+    // Check localStorage for user data
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const userData: User = JSON.parse(storedUser);
+        setUser(userData);
+      } catch {
+        // Invalid user data, clear it
+        localStorage.removeItem('user');
+        router.push('/login');
+      }
+    } else {
       router.push('/login');
     }
-  }, [user, loading, router]);
+    setLoading(false);
+  }, [router]);
 
   const handleLogout = () => {
-    logout();
+    localStorage.removeItem('user');
     router.push('/login');
   };
 
@@ -35,18 +48,9 @@ export default function AdminLayout({
     );
   }
 
-  if (!user || user.role !== 'ADMIN') {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="bg-red-100 text-red-800 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-2xl">!</span>
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
-          <p className="text-gray-600">You do not have permission to access this page.</p>
-        </div>
-      </div>
-    );
+  // If no user, redirect to login
+  if (!user) {
+    return null; // Will redirect in useEffect
   }
 
   return (

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { UserModel, hashPassword, generateToken } from '@/lib/dummydata';
+import { UserModel } from '@/lib/dummydata';
 
 export async function POST(request: NextRequest) {
   try {
@@ -40,40 +40,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Hash password
-    const hashedPassword = await hashPassword(password);
-
-    // Create user
+    // Create user with plain text password
     const newUser = await UserModel.create({
       name,
       email,
-      password: hashedPassword,
+      password: password,
       role,
     });
-
-    // Generate token
-    const token = generateToken(newUser.id, newUser.role);
 
     // Create user object without password
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password: _, ...userWithoutPassword } = newUser;
 
-    // Set HTTP-only cookie
-    const response = NextResponse.json({
+    return NextResponse.json({
       success: true,
       message: 'Registration successful',
       user: userWithoutPassword,
     }, { status: 201 });
-
-    response.cookies.set('auth-token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: '/',
-    });
-
-    return response;
 
   } catch (error) {
     console.error('Registration error:', error);

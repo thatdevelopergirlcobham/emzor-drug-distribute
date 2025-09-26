@@ -116,6 +116,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
       if (response.ok && data.success) {
         dispatch({ type: 'LOGIN_SUCCESS', payload: data.user });
+        localStorage.setItem('user', JSON.stringify(data.user)); // Sync with useAuth
         return true;
       }
 
@@ -144,6 +145,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
       if (response.ok && data.success) {
         dispatch({ type: 'LOGIN_SUCCESS', payload: data.user });
+        localStorage.setItem('user', JSON.stringify(data.user)); // Sync with useAuth
         return true;
       }
 
@@ -235,7 +237,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   }, [state.cart, state.currentUser, getCartTotal]);
 
-  // Check for existing session on mount
+  // Check for existing session on mount and sync with useAuth
   React.useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -247,6 +249,93 @@ export function UserProvider({ children }: { children: ReactNode }) {
       }
     }
   }, []);
+
+  // Listen for localStorage changes
+  React.useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'user') {
+        if (e.newValue) {
+          try {
+            const userData: User = JSON.parse(e.newValue);
+            dispatch({ type: 'LOGIN_SUCCESS', payload: userData });
+          } catch {
+            dispatch({ type: 'LOGOUT' });
+          }
+        } else {
+          dispatch({ type: 'LOGOUT' });
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  // Also listen for programmatic localStorage changes
+  React.useEffect(() => {
+    const checkStorage = () => {
+      const storedUser = localStorage.getItem('user');
+      if (storedUser && !state.isAuthenticated) {
+        try {
+          const userData: User = JSON.parse(storedUser);
+          dispatch({ type: 'LOGIN_SUCCESS', payload: userData });
+        } catch {
+          localStorage.removeItem('user');
+        }
+      } else if (!storedUser && state.isAuthenticated) {
+        dispatch({ type: 'LOGOUT' });
+      }
+    };
+
+    const interval = setInterval(checkStorage, 1000);
+    return () => clearInterval(interval);
+  }, [state.isAuthenticated]);
+
+  // Initialize with some sample orders for demo purposes
+  React.useEffect(() => {
+    if (state.orders.length === 0 && state.isAuthenticated) {
+      // Add some sample orders for demo
+      const sampleOrders: Order[] = [
+        {
+          id: 'order-001',
+          userId: 'user-001',
+          items: [
+            {
+              product: {
+                id: 'prod-001',
+                name: 'Paracetamol 500mg',
+                category: 'Analgesics',
+                price: 150,
+                description: 'Effective pain relief and fever reducer',
+                imageUrl: '/images/paracetamol.jpg',
+                stock: 100,
+                createdAt: new Date('2024-01-01'),
+                updatedAt: new Date('2024-01-01')
+              },
+              quantity: 2,
+              price: 150
+            }
+          ],
+          total: 300,
+          status: 'DELIVERED',
+          shippingAddress: {
+            fullName: 'John Doe',
+            address: '123 Main St',
+            city: 'Lagos',
+            state: 'Lagos',
+            postalCode: '100001',
+            phone: '+234123456789'
+          },
+          createdAt: new Date('2024-01-15'),
+          updatedAt: new Date('2024-01-16')
+        }
+      ];
+
+      sampleOrders.forEach(order => {
+        dispatch({ type: 'ADD_ORDER', payload: order });
+      });
+    }
+  }, [state.isAuthenticated, state.orders.length]);
 
   const value: UserContextType = {
     state,

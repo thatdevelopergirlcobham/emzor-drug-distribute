@@ -1,37 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { connectToDatabase, getDatabaseModels, verifyToken } from '@/lib/dummydata';
+import { NextResponse } from 'next/server';
+import { UserModel } from '@/lib/dummydata';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    await connectToDatabase();
-    const { UserModel } = getDatabaseModels();
-
-    // Check authentication and admin role
-    const token = request.cookies.get('auth-token')?.value;
-
-    if (!token) {
-      return NextResponse.json(
-        { success: false, message: 'Authentication required' },
-        { status: 401 }
-      );
-    }
-
-    const decoded = verifyToken(token);
-
-    if (!decoded || decoded.role !== 'ADMIN') {
-      return NextResponse.json(
-        { success: false, message: 'Admin access required' },
-        { status: 403 }
-      );
-    }
-
-    const users = await UserModel.find({}).then(users =>
-      users.map(user => ({ ...user, password: undefined }))
-    );
+    const users = await UserModel.find();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const usersWithoutPasswords = users.map(({ password, ...user }) => user);
 
     return NextResponse.json({
       success: true,
-      data: users,
+      data: usersWithoutPasswords,
     }, { status: 200 });
 
   } catch (error) {

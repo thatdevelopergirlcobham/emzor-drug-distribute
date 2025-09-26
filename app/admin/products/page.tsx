@@ -6,12 +6,15 @@ import Image from 'next/image';
 import { Plus, Edit, Trash2, Search, Filter, Package } from 'lucide-react';
 import { Product } from '@/types';
 import { useProducts } from '@/hooks/useProducts';
+import ProductForm from '@/components/admin/ProductForm';
 
 export default function AdminProductsPage() {
-  const { products, loading, deleteProduct } = useProducts();
+  const { products, loading, deleteProduct, fetchProducts } = useProducts();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   // Get unique categories
   const categories = Array.from(new Set(products.map(product => product.category)));
@@ -63,19 +66,31 @@ export default function AdminProductsPage() {
 
   return (
     <div className="space-y-8">
+      <ProductForm
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={() => {
+          fetchProducts();
+          setIsModalOpen(false);
+        }}
+        product={selectedProduct}
+      />
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Products Management</h1>
           <p className="text-gray-600 mt-2">Manage your product inventory</p>
         </div>
-        <Link
-          href="/admin/products/new"
+        <button
+          onClick={() => {
+            setSelectedProduct(null);
+            setIsModalOpen(true);
+          }}
           className="bg-blue-600 text-white hover:bg-blue-700 transition-colors px-6 py-3 rounded-lg font-semibold flex items-center space-x-2"
         >
           <Plus className="h-5 w-5" />
           <span>Add New Product</span>
-        </Link>
+        </button>
       </div>
 
       {/* Filters */}
@@ -176,13 +191,16 @@ export default function AdminProductsPage() {
 
                   {/* Action Buttons */}
                   <div className="flex space-x-2">
-                    <Link
-                      href={`/admin/products/${product.id}/edit`}
+                    <button
+                      onClick={() => {
+                        setSelectedProduct(product);
+                        setIsModalOpen(true);
+                      }}
                       className="flex-1 bg-blue-600 text-white hover:bg-blue-700 transition-colors py-2 px-3 rounded-lg text-sm font-medium flex items-center justify-center space-x-1"
                     >
                       <Edit className="h-4 w-4" />
                       <span>Edit</span>
-                    </Link>
+                    </button>
                     <button
                       onClick={() => handleDeleteProduct(product.id)}
                       className="bg-red-600 text-white hover:bg-red-700 transition-colors py-2 px-3 rounded-lg text-sm font-medium flex items-center justify-center"

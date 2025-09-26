@@ -1,17 +1,34 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ShoppingCart, Search, Menu, LogOut } from 'lucide-react';
 import { useUser } from '@/context/UserContext';
+import { User } from '@/types';
 
 export default function Header() {
   const router = useRouter();
   const { state: userState, logout: userLogout } = useUser();
   const [searchTerm, setSearchTerm] = useState('');
+  const [user, setUser] = useState<User | null>(null);
 
-  const cartItemCount = userState.isAuthenticated ? (userState.cart || []).reduce((total, item) => total + item.quantity, 0) : 0;
+  useEffect(() => {
+    // Check localStorage for user data
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const userData: User = JSON.parse(storedUser);
+        setUser(userData);
+      } catch {
+        // Invalid user data, clear it
+        localStorage.removeItem('user');
+        setUser(null);
+      }
+    }
+  }, []);
+
+  const cartItemCount = user ? userState.cart.reduce((total, item) => total + item.quantity, 0) : 0;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,25 +39,11 @@ export default function Header() {
 
   const handleUserLogout = () => {
     userLogout();
-    // Clear admin token if it exists
+    // Clear localStorage
     if (typeof window !== 'undefined') {
-      document.cookie = 'auth-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      localStorage.removeItem('user');
     }
     router.push('/');
-  };
-
-  // Check if current user is admin based on token
-  const isAdminUser = () => {
-    if (typeof window === 'undefined') return false;
-    const token = document.cookie.split(';').find(c => c.trim().startsWith('auth-token='));
-    if (!token) return false;
-
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.role === 'ADMIN';
-    } catch {
-      return false;
-    }
   };
 
   return (
@@ -93,7 +96,7 @@ export default function Header() {
             </button>
 
             {/* Cart */}
-            {userState.isAuthenticated ? (
+            {user ? (
               <Link href="/cart" className="relative text-gray-600 hover:text-primary transition-colors">
                 <ShoppingCart className="h-5 w-5" />
                 {cartItemCount > 0 && (
@@ -112,7 +115,7 @@ export default function Header() {
             )}
 
             {/* User/Admin Authentication */}
-            {isAdminUser() ? (
+            {user?.role === 'ADMIN' ? (
               <div className="flex items-center space-x-4">
                 <Link
                   href="/admin/dashboard"
@@ -127,7 +130,7 @@ export default function Header() {
                   <LogOut className="h-5 w-5" />
                 </button>
               </div>
-            ) : userState.isAuthenticated ? (
+            ) : user ? (
               <div className="flex items-center space-x-4">
                 <Link
                   href="/orders"

@@ -1,37 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connectToDatabase, getDatabaseModels, verifyToken } from '@/lib/dummydata';
+import { OrderModel } from '@/lib/dummydata';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    await connectToDatabase();
-    const { OrderModel } = getDatabaseModels();
-
-    // Check authentication
-    const token = request.cookies.get('auth-token')?.value;
-
-    if (!token) {
-      return NextResponse.json(
-        { success: false, message: 'Authentication required' },
-        { status: 401 }
-      );
-    }
-
-    const decoded = verifyToken(token);
-
-    if (!decoded) {
-      return NextResponse.json(
-        { success: false, message: 'Invalid token' },
-        { status: 401 }
-      );
-    }
-
-    // Get orders based on user role
-    let orders;
-    if (decoded.role === 'ADMIN') {
-      orders = await OrderModel.find({});
-    } else {
-      orders = await OrderModel.find({ userId: decoded.userId });
-    }
+    // Get all orders (no authentication required)
+    const orders = await OrderModel.find();
 
     return NextResponse.json({
       success: true,
@@ -49,34 +22,12 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    await connectToDatabase();
-    const { OrderModel } = getDatabaseModels();
-
-    // Check authentication
-    const token = request.cookies.get('auth-token')?.value;
-
-    if (!token) {
-      return NextResponse.json(
-        { success: false, message: 'Authentication required' },
-        { status: 401 }
-      );
-    }
-
-    const decoded = verifyToken(token);
-
-    if (!decoded) {
-      return NextResponse.json(
-        { success: false, message: 'Invalid token' },
-        { status: 401 }
-      );
-    }
-
     const orderData = await request.json();
 
-    // Create new order
+    // Create new order (no authentication required)
     const newOrder = await OrderModel.create({
       ...orderData,
-      userId: decoded.userId,
+      userId: orderData.userId || 'user-001', // Default user if not provided
       id: `order-${Date.now()}`,
     });
 

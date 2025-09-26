@@ -1,20 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { UserModel, generateToken } from '@/lib/dummydata';
+import { UserModel } from '@/lib/dummydata';
 
 export async function POST(request: NextRequest) {
   try {
-    const { email: userEmail, password: userPassword } = await request.json();
+    const { email, password } = await request.json();
 
-    // Validate input
-    if (!userEmail || !userPassword) {
+    if (!email || !password) {
       return NextResponse.json(
         { success: false, message: 'Email and password are required' },
         { status: 400 }
       );
     }
 
-    // Find user
-    const user = await UserModel.findOne({ email: userEmail });
+    const user = await UserModel.findOne({ email });
 
     if (!user) {
       return NextResponse.json(
@@ -23,39 +21,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check password (simple comparison for mock data)
-    const isValidPassword = userPassword === user.password;
+    // Simple string comparison for plain text passwords
+    const isPasswordValid = password === user.password;
 
-    if (!isValidPassword) {
+    if (!isPasswordValid) {
       return NextResponse.json(
         { success: false, message: 'Invalid email or password' },
         { status: 401 }
       );
     }
 
-    // Create user object without password
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...userWithoutPassword } = user;
+    const { password: _, ...userWithoutPassword } = user;
 
-    // Generate token
-    const token = generateToken(user.id, user.role);
-
-    // Set HTTP-only cookie
-    const response = NextResponse.json({
+    return NextResponse.json({
       success: true,
       message: 'Login successful',
       user: userWithoutPassword,
-    }, { status: 200 });
-
-    response.cookies.set('auth-token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: '/',
     });
-
-    return response;
 
   } catch (error) {
     console.error('Login error:', error);

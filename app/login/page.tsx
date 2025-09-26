@@ -30,8 +30,13 @@ function LoginPageInner() {
     try {
       const success = await login(credentials);
       if (success) {
+        // Get the user data from localStorage
         const user = JSON.parse(localStorage.getItem('user') || '{}');
-        router.push(user.role === 'ADMIN' ? '/admin/dashboard' : '/cart');
+        if (user.role === 'ADMIN') {
+          router.push('/admin/dashboard');
+        } else {
+          router.push('/products');
+        }
       }
     } catch {
       setLocalError('Login failed. Please try again.');
@@ -104,14 +109,6 @@ function LoginPageInner() {
               </Link>
             </p>
             
-            <div className="text-center">
-              <Link 
-                href="/admin/login" 
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-              >
-                Admin Login →
-              </Link>
-            </div>
 
             <div className="bg-blue-50 rounded-lg p-4">
               <h3 className="text-sm font-medium text-blue-800 mb-2">Demo Credentials</h3>

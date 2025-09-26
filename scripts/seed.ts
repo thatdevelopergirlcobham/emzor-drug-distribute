@@ -1,11 +1,9 @@
-import { UserModel, ProductModel, hashPassword, clearAllData } from '../lib/dummydata';
+import { UserModel, ProductModel } from '../lib/dummydata';
 import { User, Product } from '@/types';
 
 const seedData = async () => {
   try {
-    // Clear existing data and reinitialize with fresh data
-    clearAllData();
-    console.log('Cleared existing data and initialized with fresh dummy data');
+    console.log('Starting database seeding...');
 
     // Check if data already exists (this will always be true after clearAllData)
     const existingUsers = await UserModel.countDocuments();
@@ -16,12 +14,11 @@ const seedData = async () => {
     // Add additional users if needed
     if (existingUsers < 4) { // We start with 3 users (admin, supervisor, student)
       // Create additional test users
-      const testUserPassword = await hashPassword('password');
       const testUser: Partial<User> = {
         id: 'test-user-001',
         name: 'Test User',
         email: 'test@example.com',
-        password: testUserPassword,
+        password: 'password',
         role: 'USER',
       };
       await UserModel.create(testUser);
@@ -70,7 +67,9 @@ const seedData = async () => {
         }
       ];
 
-      await ProductModel.insertMany(additionalProducts);
+      for (const product of additionalProducts) {
+        await ProductModel.create(product);
+      }
       console.log('Additional sample products created');
     }
 

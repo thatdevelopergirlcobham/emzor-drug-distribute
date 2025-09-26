@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { User } from '@/types';
-import { UserModel, hashPassword } from '@/lib/dummydata';
+import { UserModel } from '@/lib/dummydata';
 
 interface UsersState {
   users: User[];
@@ -44,13 +44,11 @@ export function useUsers() {
     role: 'ADMIN' | 'USER' | 'SUPERVISOR' | 'STUDENT';
   }): Promise<User | null> => {
     try {
-      const hashedPassword = await hashPassword(userData.password);
-
       const newUser = await UserModel.create({
         id: `user-${Date.now()}`,
         name: userData.name,
         email: userData.email,
-        password: hashedPassword,
+        password: userData.password,
         role: userData.role,
       });
 
@@ -84,16 +82,12 @@ export function useUsers() {
         updatedAt: Date;
       };
 
-      // If password is being updated, hash it
+      // If password is being updated, use plain text
       if (userData.password) {
-        updateData.password = await hashPassword(userData.password);
+        updateData.password = userData.password;
       }
 
-      const updatedUser = await UserModel.findOneAndUpdate(
-        { id },
-        updateData,
-        { new: true }
-      );
+      const updatedUser = await UserModel.findByIdAndUpdate(id, updateData);
 
       if (!updatedUser) {
         throw new Error('User not found');

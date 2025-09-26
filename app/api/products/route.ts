@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ProductModel, verifyToken } from '@/lib/dummydata';
+import { ProductModel } from '@/lib/dummydata';
 
 export async function GET() {
   try {
@@ -20,25 +20,6 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    // Check authentication and admin role
-    const token = request.cookies.get('auth-token')?.value;
-
-    if (!token) {
-      return NextResponse.json(
-        { success: false, message: 'Authentication required' },
-        { status: 401 }
-      );
-    }
-
-    const decoded = verifyToken(token);
-
-    if (!decoded || decoded.role !== 'ADMIN') {
-      return NextResponse.json(
-        { success: false, message: 'Admin access required' },
-        { status: 403 }
-      );
-    }
-
     const productData = await request.json();
 
     // Validate required fields

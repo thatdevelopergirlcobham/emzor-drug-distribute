@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connectToDatabase, getDatabaseModels, verifyToken } from '@/lib/dummydata';
-import { User } from '@/types';
+import { UserModel, verifyToken } from '@/lib/dummydata';
 
 export async function GET(request: NextRequest) {
   try {
-    await connectToDatabase();
-    const { UserModel } = getDatabaseModels();
 
     // Check authentication
     const token = request.cookies.get('auth-token')?.value;
@@ -27,12 +24,15 @@ export async function GET(request: NextRequest) {
     }
 
     // Get user data
-    const user = await UserModel.findOne({ id: decoded.userId }).then((user: User | null) => {
-      if (user) {
-        return { ...user, password: undefined };
-      }
-      return null;
-    });
+    const user = await UserModel.findOne({ id: decoded.userId });
+    if (user) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, ...userWithoutPassword } = user;
+      return NextResponse.json({
+        success: true,
+        data: userWithoutPassword,
+      }, { status: 200 });
+    }
 
     if (!user) {
       return NextResponse.json(
