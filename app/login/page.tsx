@@ -96,12 +96,31 @@ function LoginPageInner() {
             </button>
           </form>
 
-          <p className="mt-6 text-center text-gray-600">
-            Don&apos;t have an account?{' '}
-            <Link href="/register" className="text-primary hover:underline font-medium">
-              Sign up
-            </Link>
-          </p>
+          <div className="mt-6 space-y-4">
+            <p className="text-center text-gray-600">
+              Don&apos;t have an account?{' '}
+              <Link href="/register" className="text-primary hover:underline font-medium">
+                Sign up
+              </Link>
+            </p>
+            
+            <div className="text-center">
+              <Link 
+                href="/admin/login" 
+                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+              >
+                Admin Login →
+              </Link>
+            </div>
+
+            <div className="bg-blue-50 rounded-lg p-4">
+              <h3 className="text-sm font-medium text-blue-800 mb-2">Demo Credentials</h3>
+              <div className="text-sm text-blue-700 space-y-1">
+                <p><strong>User:</strong> user@emzor.com / password</p>
+                <p><strong>Admin:</strong> admin@emzor.com / password</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

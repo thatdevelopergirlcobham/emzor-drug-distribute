@@ -115,6 +115,12 @@ export default function AdminDashboard() {
               Add New Product
             </Link>
             <Link
+              href="/admin/products"
+              className="block p-3 bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors rounded-lg font-medium"
+            >
+              Manage Products
+            </Link>
+            <Link
               href="/admin/users"
               className="block p-3 bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors rounded-lg font-medium"
             >

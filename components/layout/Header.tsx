@@ -130,10 +130,10 @@ export default function Header() {
             ) : userState.isAuthenticated ? (
               <div className="flex items-center space-x-4">
                 <Link
-                  href="/"
+                  href="/orders"
                   className="text-gray-600 hover:text-primary transition-colors font-medium"
                 >
-                  My Account
+                  My Orders
                 </Link>
                 <button
                   onClick={handleUserLogout}

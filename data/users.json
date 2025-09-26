@@ -3,26 +3,35 @@
     "id": "admin-001",
     "name": "System Administrator",
     "email": "admin@emzor.com",
-    "password": "password",
+    "password": "$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj2JjpIXUjye",
     "role": "ADMIN",
     "createdAt": "2023-10-27T10:00:00.000Z",
     "updatedAt": "2023-10-27T10:00:00.000Z"
   },
   {
-    "id": "supervisor-001",
-    "name": "John Supervisor",
-    "email": "supervisor@emzor.com",
-    "password": "password",
-    "role": "SUPERVISOR",
+    "id": "user-001",
+    "name": "John Doe",
+    "email": "user@emzor.com",
+    "password": "$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj2JjpIXUjye",
+    "role": "USER",
     "createdAt": "2023-10-27T10:00:00.000Z",
     "updatedAt": "2023-10-27T10:00:00.000Z"
   },
   {
-    "id": "student-001",
-    "name": "Jane Student",
-    "email": "student@emzor.com",
-    "password": "password",
-    "role": "STUDENT",
+    "id": "user-002",
+    "name": "Jane Smith",
+    "email": "jane@emzor.com",
+    "password": "$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj2JjpIXUjye",
+    "role": "USER",
+    "createdAt": "2023-10-27T10:00:00.000Z",
+    "updatedAt": "2023-10-27T10:00:00.000Z"
+  },
+  {
+    "id": "user-003",
+    "name": "Mike Johnson",
+    "email": "mike@emzor.com",
+    "password": "$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj2JjpIXUjye",
+    "role": "USER",
     "createdAt": "2023-10-27T10:00:00.000Z",
     "updatedAt": "2023-10-27T10:00:00.000Z"
   }

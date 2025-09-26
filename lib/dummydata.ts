@@ -219,3 +219,22 @@ export const verifyToken = (token: string): { userId: string; role: string } | n
     return null;
   }
 };
+
+// Database connection simulation
+export const connectToDatabase = async (): Promise<void> => {
+  // Ensure data directory exists
+  try {
+    await fs.mkdir(dataPath, { recursive: true });
+  } catch (error) {
+    // Directory already exists
+  }
+};
+
+// Get database models
+export const getDatabaseModels = () => {
+  return {
+    UserModel,
+    ProductModel,
+    OrderModel
+  };
+};
