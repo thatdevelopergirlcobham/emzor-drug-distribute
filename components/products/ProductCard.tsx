@@ -26,7 +26,8 @@ export default function ProductCard({ product }: ProductCardProps) {
     setIsAdding(true);
     try {
       addToCart(product, 1);
-      // You could add a toast notification here
+      // Redirect to cart page after adding
+      router.push('/cart');
     } catch (error) {
       console.error('Failed to add to cart:', error);
     } finally {

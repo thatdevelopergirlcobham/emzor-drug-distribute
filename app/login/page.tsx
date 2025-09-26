@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
@@ -18,10 +18,21 @@ export default function LoginPage() {
 function LoginPageInner() {
   const router = useRouter();
 
-  const { login, loading, error: authError } = useAuth();
+  const { login, loading, error: authError, user } = useAuth();
   const [credentials, setCredentials] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [localError, setLocalError] = useState('');
+
+  // Handle redirect when user logs in successfully
+  useEffect(() => {
+    if (user) {
+      if (user.role === 'ADMIN') {
+        router.push('/admin/dashboard');
+      } else {
+        router.push('/products');
+      }
+    }
+  }, [user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,15 +40,10 @@ function LoginPageInner() {
 
     try {
       const success = await login(credentials);
-      if (success) {
-        // Get the user data from localStorage
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        if (user.role === 'ADMIN') {
-          router.push('/admin/dashboard');
-        } else {
-          router.push('/products');
-        }
+      if (!success) {
+        setLocalError('Login failed. Please check your credentials.');
       }
+      // Redirect will be handled by useEffect when user state updates
     } catch {
       setLocalError('Login failed. Please try again.');
     }

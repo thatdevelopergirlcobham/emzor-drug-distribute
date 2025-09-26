@@ -95,15 +95,17 @@ export default function Header() {
               <Search className="h-5 w-5" />
             </button>
 
-            {/* Cart - Always accessible */}
-            <Link href="/cart" className="relative text-gray-600 hover:text-primary transition-colors">
-              <ShoppingCart className="h-5 w-5" />
-              {user && cartItemCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
-                  {cartItemCount}
-                </span>
-              )}
-            </Link>
+            {/* Cart - Only show for logged in users */}
+            {user && (
+              <Link href="/cart" className="relative text-gray-600 hover:text-primary transition-colors">
+                <ShoppingCart className="h-5 w-5" />
+                {cartItemCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                    {cartItemCount}
+                  </span>
+                )}
+              </Link>
+            )}
 
             {/* User/Admin Authentication */}
             {user?.role === 'ADMIN' ? (
@@ -131,12 +133,6 @@ export default function Header() {
                   className="text-gray-600 hover:text-primary transition-colors font-medium"
                 >
                   My Orders
-                </Link>
-                <Link
-                  href="/account"
-                  className="text-gray-600 hover:text-primary transition-colors font-medium"
-                >
-                  Account
                 </Link>
                 <button
                   onClick={handleUserLogout}

@@ -41,7 +41,7 @@ function userReducer(state: UserState, action: UserAction): UserState {
     case 'LOGIN_SUCCESS':
       return { ...state, currentUser: action.payload, isAuthenticated: true, loading: false };
     case 'LOGOUT':
-      return { ...state, currentUser: null, isAuthenticated: false, cart: [], orders: [] };
+      return { ...state, currentUser: null, isAuthenticated: false, orders: [] };
     case 'ADD_TO_CART':
       const existingItemIndex = state.cart.findIndex(item => item.product.id === action.payload.product.id);
       if (existingItemIndex >= 0) {
@@ -237,7 +237,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   }, [state.cart, state.currentUser, getCartTotal]);
 
-  // Check for existing session on mount and sync with useAuth
+  // Check for existing session and cart on mount
   React.useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -246,6 +246,19 @@ export function UserProvider({ children }: { children: ReactNode }) {
         dispatch({ type: 'LOGIN_SUCCESS', payload: user });
       } catch {
         localStorage.removeItem('user');
+      }
+    }
+    
+    // Load cart from localStorage
+    const storedCart = localStorage.getItem('cart');
+    if (storedCart) {
+      try {
+        const cartItems: CartItem[] = JSON.parse(storedCart);
+        cartItems.forEach(item => {
+          dispatch({ type: 'ADD_TO_CART', payload: item });
+        });
+      } catch {
+        localStorage.removeItem('cart');
       }
     }
   }, []);
@@ -290,6 +303,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
     const interval = setInterval(checkStorage, 1000);
     return () => clearInterval(interval);
   }, [state.isAuthenticated]);
+
+  // Save cart to localStorage whenever it changes
+  React.useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(state.cart));
+  }, [state.cart]);
 
   // Initialize with some sample orders for demo purposes
   React.useEffect(() => {

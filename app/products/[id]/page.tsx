@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Product } from '@/types';
+import { Product, User } from '@/types';
 import { useProducts } from '@/hooks/useProducts';
 import { useUser } from '@/context/UserContext';
 import Header from '@/components/layout/Header';
@@ -15,6 +15,20 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
   const { addToCart } = useUser();
   const [product, setProduct] = useState<Product | null>(null);
   const [quantity, setQuantity] = useState(1);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    // Check if user is logged in
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const userData: User = JSON.parse(storedUser);
+        setUser(userData);
+      } catch {
+        setUser(null);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const fetchedProduct = getProductById(params.id);
@@ -27,9 +41,14 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
   const handleAddToCart = () => {
     if (product) {
-      addToCart(product, quantity);
-      // Optionally, show a notification or redirect to cart
-      router.push('/cart');
+      if (!user) {
+        // User not logged in - redirect to login
+        router.push('/login?redirect=' + encodeURIComponent(`/products/${product.id}`));
+      } else {
+        // User is logged in - add to cart and redirect to cart page
+        addToCart(product, quantity);
+        router.push('/cart');
+      }
     }
   };
 

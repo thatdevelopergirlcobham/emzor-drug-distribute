@@ -7,16 +7,13 @@ import Header from '@/components/layout/Header';
 import { Minus, Plus, Trash2, ArrowRight, ShoppingBag } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 
 export default function CartPage() {
-  const router = useRouter();
   const { state, updateCartQuantity, removeFromCart, getCartTotal } = useUser();
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check localStorage for user data (cart accessible without login but shows different content)
+    // Check localStorage for user data (optional for display purposes only)
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       try {
@@ -28,23 +25,11 @@ export default function CartPage() {
         setUser(null);
       }
     }
-    setLoading(false);
-  }, [router]);
+  }, []);
 
-  const cartTotal = user ? getCartTotal() : 0;
+  const cartTotal = getCartTotal();
   const deliveryFee = cartTotal > 10000 ? 0 : 500; // Free delivery over ₦10,000
   const finalTotal = cartTotal + deliveryFee;
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        <div className="text-center py-16">
-          <p>Loading cart...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -53,35 +38,10 @@ export default function CartPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Shopping Cart</h1>
-          <p className="text-gray-600 mt-2">{user ? state.cart.length : 0} item(s) in your cart</p>
+          <p className="text-gray-600 mt-2">{state.cart.length} item(s) in your cart</p>
         </div>
 
-        {!user ? (
-          <div className="text-center py-16">
-            <div className="bg-gray-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
-              <ShoppingBag className="h-12 w-12 text-gray-400" />
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">Sign in to view your cart</h1>
-            <p className="text-gray-600 mb-8 max-w-md mx-auto">
-              Please sign in to add items to your cart and make purchases.
-            </p>
-            <div className="flex justify-center space-x-4">
-              <Link
-                href="/login?redirect=/cart"
-                className="inline-flex items-center space-x-2 bg-blue-600 text-white hover:bg-blue-700 transition-colors px-8 py-3 rounded-lg font-semibold"
-              >
-                <span>Sign In</span>
-              </Link>
-              <Link
-                href="/products"
-                className="inline-flex items-center space-x-2 border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors px-8 py-3 rounded-lg font-semibold"
-              >
-                <span>Browse Products</span>
-                <ArrowRight className="h-5 w-5" />
-              </Link>
-            </div>
-          </div>
-        ) : state.cart.length === 0 ? (
+        {state.cart.length === 0 ? (
           <div className="text-center py-16">
             <div className="bg-gray-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
               <ShoppingBag className="h-12 w-12 text-gray-400" />
@@ -173,7 +133,7 @@ export default function CartPage() {
 
                 <div className="space-y-4">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Subtotal ({user ? state.cart.length : 0} items)</span>
+                    <span className="text-gray-600">Subtotal ({state.cart.length} items)</span>
                     <span className="font-semibold">₦{cartTotal.toLocaleString()}</span>
                   </div>
 
