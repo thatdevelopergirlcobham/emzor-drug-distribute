@@ -1,16 +1,36 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { ArrowLeft, CreditCard, Truck, Shield } from 'lucide-react';
-import Header from '@/components/layout/Header';
+import { useState, useEffect } from 'react';
+import { User, ShippingAddress, PaymentDetails } from '@/types';
 import { useUser } from '@/context/UserContext';
-import { ShippingAddress, PaymentDetails } from '@/types';
+import Header from '@/components/layout/Header';
+import { ArrowLeft, CreditCard, Truck, Shield } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { state, placeOrder, getCartTotal } = useUser();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Check localStorage for user data
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const userData: User = JSON.parse(storedUser);
+        setUser(userData);
+      } catch {
+        // Invalid user data, clear it
+        localStorage.removeItem('user');
+        router.push('/login?redirect=/checkout');
+      }
+    } else {
+      router.push('/login?redirect=/checkout');
+    }
+    setLoading(false);
+  }, [router]);
 
   const [shippingAddress, setShippingAddress] = useState<ShippingAddress>({
     fullName: '',
@@ -30,6 +50,21 @@ export default function CheckoutPage() {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isProcessing, setIsProcessing] = useState(false);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="text-center py-16">
+          <p>Loading checkout...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null; // Will redirect in useEffect
+  }
 
   const cartTotal = getCartTotal();
   const deliveryFee = cartTotal > 10000 ? 0 : 500;

@@ -1,14 +1,52 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { User, ShoppingBag, CreditCard, Package } from 'lucide-react';
-import Header from '@/components/layout/Header';
+import { useState, useEffect } from 'react';
+import { User as UserType } from '@/types';
 import { useUser } from '@/context/UserContext';
+import Header from '@/components/layout/Header';
+import { User, ShoppingBag, CreditCard, Package } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function AccountPage() {
+  const router = useRouter();
   const { state } = useUser();
+  const [user, setUser] = useState<UserType | null>(null);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('profile');
+
+  useEffect(() => {
+    // Check localStorage for user data
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const userData: UserType = JSON.parse(storedUser);
+        setUser(userData);
+      } catch {
+        // Invalid user data, clear it
+        localStorage.removeItem('user');
+        router.push('/login?redirect=/account');
+      }
+    } else {
+      router.push('/login?redirect=/account');
+    }
+    setLoading(false);
+  }, [router]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="text-center py-16">
+          <p>Loading account...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null; // Will redirect in useEffect
+  }
 
   if (!state.isAuthenticated) {
     return (

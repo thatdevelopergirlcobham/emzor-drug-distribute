@@ -95,28 +95,20 @@ export default function Header() {
               <Search className="h-5 w-5" />
             </button>
 
-            {/* Cart */}
-            {user ? (
-              <Link href="/cart" className="relative text-gray-600 hover:text-primary transition-colors">
-                <ShoppingCart className="h-5 w-5" />
-                {cartItemCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
-                    {cartItemCount}
-                  </span>
-                )}
-              </Link>
-            ) : (
-              <button
-                onClick={() => router.push('/login?redirect=/cart')}
-                className="relative text-gray-600 hover:text-primary transition-colors"
-              >
-                <ShoppingCart className="h-5 w-5" />
-              </button>
-            )}
+            {/* Cart - Always accessible */}
+            <Link href="/cart" className="relative text-gray-600 hover:text-primary transition-colors">
+              <ShoppingCart className="h-5 w-5" />
+              {user && cartItemCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                  {cartItemCount}
+                </span>
+              )}
+            </Link>
 
             {/* User/Admin Authentication */}
             {user?.role === 'ADMIN' ? (
               <div className="flex items-center space-x-4">
+                <span className="text-sm text-gray-600">Welcome, {user.name}</span>
                 <Link
                   href="/admin/dashboard"
                   className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors font-medium"
@@ -126,21 +118,30 @@ export default function Header() {
                 <button
                   onClick={handleUserLogout}
                   className="text-gray-600 hover:text-red-600 transition-colors"
+                  title="Logout"
                 >
                   <LogOut className="h-5 w-5" />
                 </button>
               </div>
             ) : user ? (
               <div className="flex items-center space-x-4">
+                <span className="text-sm text-gray-600">Hi, {user.name}</span>
                 <Link
                   href="/orders"
                   className="text-gray-600 hover:text-primary transition-colors font-medium"
                 >
                   My Orders
                 </Link>
+                <Link
+                  href="/account"
+                  className="text-gray-600 hover:text-primary transition-colors font-medium"
+                >
+                  Account
+                </Link>
                 <button
                   onClick={handleUserLogout}
                   className="text-gray-600 hover:text-red-600 transition-colors"
+                  title="Logout"
                 >
                   <LogOut className="h-5 w-5" />
                 </button>
